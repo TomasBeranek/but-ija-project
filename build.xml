@@ -5,24 +5,28 @@
   <property name="dest.dir" value="dest"/>
   <property name="src.dir" value="src"/>
   <property name="doc.dir" value="doc"/>
+  <property name="data.dir" value="data"/>
   <property name="jar.name" value="WarehouseSimulation.jar"/>
+  <property name="warehouse.data" value="${data.dir}/warehouse.json"/>
+  <property name="goods.data" value="${data.dir}/goods.json"/>
+  <property name="orders.data" value="${data.dir}/orders.json"/>
 
+  <path id="lib.path">
+      <fileset dir="lib" includes="*.jar"/>
+  </path>
 
   <target name="run" depends="compile">
-    <java jar="${dest.dir}/${jar.name}" fork="true" failonerror="yes">
-      <jvmarg line="--module-path ${lib.dir} --add-modules=javafx.controls"/>
+    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes">
+      <jvmarg line="-cp dest/WarehouseSimulation.jar:lib/json-simple-1.1.jar:lib/javafx.controls.jar:lib/javafx.graphics.jar:lib/javafx.base.jar --module-path lib --add-modules=javafx.controls"/>
+      <arg value="${warehouse.data}"/>
+      <arg value="${goods.data}"/>
+      <arg value="${orders.data}"/>
     </java>
   </target>
 
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
-      <classpath>
-        <pathelement location="${lib.dir}/javafx.base.jar"/>
-        <pathelement location="${lib.dir}/javafx.controls.jar"/>
-        <pathelement location="${lib.dir}/javafx.graphics.jar"/>
-      </classpath>
-    </javac>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.path"/>
 
     <mkdir dir="${dest.dir}"/>
     <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
