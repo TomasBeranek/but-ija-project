@@ -8,19 +8,10 @@
   <property name="jar.name" value="WarehouseSimulation.jar"/>
 
 
-  <target name="run" depends="package">
+  <target name="run" depends="compile">
     <java jar="${dest.dir}/${jar.name}" fork="true" failonerror="yes">
       <jvmarg line="--module-path ${lib.dir} --add-modules=javafx.controls"/>
     </java>
-  </target>
-
-  <target name="package" depends="compile">
-    <mkdir dir="${dest.dir}"/>
-    <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
-      <manifest>
-        <attribute name="Main-Class" value="ija.project.warehouse.WarehouseSimulation"/>
-      </manifest>
-    </jar>
   </target>
 
   <target name="compile" depends="clean">
@@ -32,6 +23,13 @@
         <pathelement location="${lib.dir}/javafx.graphics.jar"/>
       </classpath>
     </javac>
+
+    <mkdir dir="${dest.dir}"/>
+    <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="ija.project.warehouse.WarehouseSimulation"/>
+      </manifest>
+    </jar>
   </target>
 
   <target name="clean">
