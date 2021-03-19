@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project name="IJA project Warehouse" default="run">
+  <property name="lib.dir" value="lib"/>
+  <property name="build.dir" value="build"/>
+  <property name="dest.dir" value="dest"/>
+  <property name="src.dir" value="src"/>
+  <property name="doc.dir" value="doc"/>
+  <property name="jar.name" value="WarehouseSimulation.jar"/>
+
+
+  <target name="run" depends="package">
+    <java jar="${dest.dir}/${jar.name}" fork="true" failonerror="yes">
+      <jvmarg line="--module-path ${lib.dir} --add-modules=javafx.controls"/>
+    </java>
+  </target>
+
+  <target name="package" depends="compile">
+    <mkdir dir="${dest.dir}"/>
+    <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="ija.project.warehouse.WarehouseSimulation"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+      <classpath>
+        <pathelement location="${lib.dir}/javafx.base.jar"/>
+        <pathelement location="${lib.dir}/javafx.controls.jar"/>
+        <pathelement location="${lib.dir}/javafx.graphics.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dest.dir}"/>
+  </target>
+</project>
