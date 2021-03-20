@@ -24,6 +24,16 @@
     </java>
   </target>
 
+  <target name="debug" depends="compile">
+    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes">
+      <jvmarg line="-cp dest/WarehouseSimulation.jar:lib/json-simple-1.1.jar:lib/javafx.controls.jar:lib/javafx.graphics.jar:lib/javafx.base.jar --module-path lib --add-modules=javafx.controls"/>
+      <arg value="${warehouse.data}"/>
+      <arg value="${goods.data}"/>
+      <arg value="${orders.data}"/>
+      <arg value="--debug"/>
+    </java>
+  </target>
+
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
     <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.path">
