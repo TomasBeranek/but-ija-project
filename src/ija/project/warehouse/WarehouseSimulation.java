@@ -45,6 +45,7 @@ public class WarehouseSimulation extends Application {
    private Text highLightedNodeID;
    private Hashtable<Integer, NodeCircle> nodes = new Hashtable<>();
    private Hashtable<Integer, ShelfRectangle> shelfs = new Hashtable<>();
+   private boolean debug = false;
 
    private List<JSONObject> loadJSONData(List<String> fileNames) {
      JSONParser parser = new JSONParser();
@@ -200,24 +201,27 @@ public class WarehouseSimulation extends Application {
          (float)Math.round(nodeInfo.getKey().getY()),
          5.0f,
          nodeInfo.getValue());
-       nodeCircle.setFill(Color.RED);
-       nodeCircle.setStrokeWidth(0);
 
-       //Creating the mouse event handler
-       EventHandler<MouseEvent> nodeClickHandler = new EventHandler<MouseEvent>() {
-          @Override
-          public void handle(MouseEvent e) {
-             if (highLightedNode != null)
-               highLightedNode.setFill(Color.RED);
+       if (debug){
+         nodeCircle.setFill(Color.RED);
+         nodeCircle.setStrokeWidth(0);
 
-             nodeCircle.setFill(Color.BLUE);
-             highLightedNode = (NodeCircle)nodeCircle;
-             highLightedNodeID.setText("Selected node: " + nodeCircle.ID);
-          }
-       };
+         //Creating the mouse event handler
+         EventHandler<MouseEvent> nodeClickHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+               if (highLightedNode != null)
+                 highLightedNode.setFill(Color.RED);
 
-       nodeCircle.addEventFilter(MouseEvent.MOUSE_CLICKED, nodeClickHandler);
-       group.getChildren().add(nodeCircle);
+               nodeCircle.setFill(Color.BLUE);
+               highLightedNode = (NodeCircle)nodeCircle;
+               highLightedNodeID.setText("Selected node: " + nodeCircle.ID+ " neighbours: " + nodeCircle.getNeighbours());
+            }
+         };
+
+         nodeCircle.addEventFilter(MouseEvent.MOUSE_CLICKED, nodeClickHandler);
+         group.getChildren().add(nodeCircle);
+       }
        nodes.put(nodeCircle.ID, nodeCircle);
      }
 
@@ -278,17 +282,23 @@ public class WarehouseSimulation extends Application {
        Pair<Integer, Integer> route = it.next();
        NodeCircle start = nodes.get(route.getKey());
        NodeCircle end = nodes.get(route.getValue());
-       Line line = new Line();
 
-       line.setStartX(start.getX());
-       line.setStartY(start.getY());
-       line.setEndX(end.getX());
-       line.setEndY(end.getY());
-       line.setFill(Color.RED);
-       line.setStrokeWidth(1);
-       line.setStroke(Color.RED);
+       if (debug){
+         Line line = new Line();
+         line.setStartX(start.getX());
+         line.setStartY(start.getY());
+         line.setEndX(end.getX());
+         line.setEndY(end.getY());
+         line.setFill(Color.RED);
+         line.setStrokeWidth(1);
+         line.setStroke(Color.RED);
 
-       group.getChildren().add(line);
+         group.getChildren().add(line);
+       }
+
+       // save each other to neighbours
+       start.addNeighbour(end.ID);
+       end.addNeighbour(start.ID);
      }
    }
 
@@ -297,6 +307,11 @@ public class WarehouseSimulation extends Application {
    public void start(Stage primaryStage) throws Exception {
       // get names of JSON files to load simulation data
       List<String> args = getParameters().getRaw();
+
+      // if the debug option is passed, make nodes and routes visible
+      if (args.size() > 3 && args.get(3).equals("--debug"))
+        this.debug = true;
+
       List<JSONObject> data = this.loadJSONData(args);
 
       Pair<Point2D, Point2D> warehouseCords = getWarehouseCords(data.get(0));
@@ -324,12 +339,11 @@ public class WarehouseSimulation extends Application {
       // add shelfs
       displayShelfs(group, shelfsCords);
 
-      // if the debug option is passed, make nodes visible
-      if (args.size() > 3 && args.get(3).equals("--debug")){
-        // add nodes
-        displayNodes(group, nodesCords);
-        displayRoutes(group, routes);
-      }
+      // add nodes
+      displayNodes(group, nodesCords);
+
+      // add routes
+      displayRoutes(group, routes);
 
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,sceneWidth, sceneHeight);

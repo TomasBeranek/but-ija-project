@@ -8,7 +8,7 @@ public class NodeCircle extends Circle {
   public int ID = -1;
   private int x;
   private int y;
-  //private set of neighbours
+  private Set<Integer> neighbours = new HashSet<>();
 
   public NodeCircle(float x, float y, float r, int id){
     super(x, y, r);
@@ -36,6 +36,10 @@ public class NodeCircle extends Circle {
   }
 
   public List<Integer> getNeighbours() {
-    return null;
+    return new ArrayList<>(neighbours);
+  }
+
+  public boolean addNeighbour(int id) {
+    return this.neighbours.add(id);
   }
 }
