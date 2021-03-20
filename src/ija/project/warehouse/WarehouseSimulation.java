@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
+
 public class WarehouseSimulation extends Application {
    private ShelfRectangle highLightedShelf = null;
    private Text highLightedShelfID;
