@@ -10,6 +10,7 @@
 package ija.project.warehouse;
 
 import ija.project.warehouse.ShelfRectangle;
+import ija.project.warehouse.NodeCircle;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -20,7 +21,7 @@ import javafx.util.*;
 import java.util.*;
 import javafx.geometry.Point2D;
 import java.lang.Math;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.*;
 import javafx.scene.paint.Color;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -41,6 +42,8 @@ public class WarehouseSimulation extends Application {
    private Text highLightedShelfID;
    private NodeCircle highLightedNode = null;
    private Text highLightedNodeID;
+   private Hashtable<Integer, NodeCircle> nodes = new Hashtable<>();
+   private Hashtable<Integer, ShelfRectangle> shelfs = new Hashtable<>();
 
    private List<JSONObject> loadJSONData(List<String> fileNames) {
      JSONParser parser = new JSONParser();
@@ -154,6 +157,7 @@ public class WarehouseSimulation extends Application {
 
        shelfRec.addEventFilter(MouseEvent.MOUSE_CLICKED, shelfClickHandler);
        group.getChildren().add(shelfRec);
+       shelfs.put(shelfRec.shelfID, shelfRec);
      }
 
      // add a text which shows ID of the selected shelf
@@ -207,12 +211,13 @@ public class WarehouseSimulation extends Application {
 
              nodeCircle.setFill(Color.BLUE);
              highLightedNode = (NodeCircle)nodeCircle;
-             highLightedNodeID.setText("Selected node: " + nodeCircle.nodeID);
+             highLightedNodeID.setText("Selected node: " + nodeCircle.ID);
           }
        };
 
        nodeCircle.addEventFilter(MouseEvent.MOUSE_CLICKED, nodeClickHandler);
        group.getChildren().add(nodeCircle);
+       nodes.put(nodeCircle.ID, nodeCircle);
      }
 
      // add a text which shows ID of the selected shelf
@@ -236,6 +241,7 @@ public class WarehouseSimulation extends Application {
      group.getChildren().add(warehouseRect);
    }
 
+
    private void displayDispensingPoint(Group group, Pair<Point2D, Point2D> dispensingPointCords) {
      Rectangle dispensingPointRec = new Rectangle(
        (int)Math.round(dispensingPointCords.getKey().getX()),
@@ -249,6 +255,43 @@ public class WarehouseSimulation extends Application {
      group.getChildren().add(dispensingPointRec);
    }
 
+
+   private List<Pair<Integer, Integer>> getAllRoutes(JSONObject data) {
+     List<Pair<Integer, Integer>> routes = new ArrayList<>();
+     JSONArray routesJSON = (JSONArray)data.get("routes");
+     Iterator it = routesJSON.iterator();
+
+     while(it.hasNext()){
+       JSONArray route = (JSONArray)it.next();
+        routes.add(new Pair<Integer, Integer>(((Long)route.get(0)).intValue(), ((Long)route.get(1)).intValue()));
+     }
+
+     return routes;
+   }
+
+
+   public void displayRoutes(Group group, List<Pair<Integer, Integer>> routes) {
+     Iterator<Pair<Integer, Integer>> it = routes.iterator();
+
+     while (it.hasNext()) {
+       Pair<Integer, Integer> route = it.next();
+       NodeCircle start = nodes.get(route.getKey());
+       NodeCircle end = nodes.get(route.getValue());
+       Line line = new Line();
+
+       line.setStartX(start.getX());
+       line.setStartY(start.getY());
+       line.setEndX(end.getX());
+       line.setEndY(end.getY());
+       line.setFill(Color.RED);
+       line.setStrokeWidth(1);
+       line.setStroke(Color.RED);
+
+       group.getChildren().add(line);
+     }
+   }
+
+
    @Override
    public void start(Stage primaryStage) throws Exception {
       // get names of JSON files to load simulation data
@@ -259,6 +302,7 @@ public class WarehouseSimulation extends Application {
       Pair<Point2D, Point2D> dispensingPointCords = getDispensingPointCords(data.get(0));
       List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords = getAllShelfsCords(data.get(0));
       List<Pair<Point2D, Integer>> nodesCords = getAllNodesCords(data.get(0));
+      List<Pair<Integer, Integer>> routes = getAllRoutes(data.get(0));
 
       int GUIWidth = 0; //not yet
       int sceneWidth =  (int)Math.round(warehouseCords.getValue().getX()) +
@@ -283,6 +327,7 @@ public class WarehouseSimulation extends Application {
       if (args.size() > 3 && args.get(3).equals("--debug")){
         // add nodes
         displayNodes(group, nodesCords);
+        displayRoutes(group, routes);
       }
 
       //Creating a Scene by passing the group object, height and width
@@ -298,7 +343,7 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
    }
 
-   
+
    public static void main(String args[]){
       launch(args);
    }
