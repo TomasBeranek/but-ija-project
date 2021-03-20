@@ -26,7 +26,9 @@
 
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.path"/>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.path">
+      <compilerarg line="-Xlint:unchecked"/>
+    </javac>
 
     <mkdir dir="${dest.dir}"/>
     <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
