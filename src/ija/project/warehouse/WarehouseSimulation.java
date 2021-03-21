@@ -26,6 +26,8 @@ import javafx.scene.paint.Color;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.*;
+import java.util.Map.Entry;
+import java.util.Set;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
@@ -46,6 +48,9 @@ public class WarehouseSimulation extends Application {
    private Hashtable<Integer, NodeCircle> nodes = new Hashtable<>();
    private Hashtable<Integer, ShelfRectangle> shelfs = new Hashtable<>();
    private boolean debug = false;
+   private int warehouseWidth = 0;
+   private int warehouseHeight = 0;
+
 
    private List<JSONObject> loadJSONData(List<String> fileNames) {
      JSONParser parser = new JSONParser();
@@ -151,9 +156,23 @@ public class WarehouseSimulation extends Application {
              if (highLightedShelf != null)
                highLightedShelf.setFill(Color.BLUE);
 
+             // display shelfs with the same goods as the selected one
+             if (debug) {
+                 Set<Entry<Integer, ShelfRectangle>> it = shelfs.entrySet();
+
+                 for (Entry<Integer, ShelfRectangle> shelf : it) {
+                    if (shelfRec.getGoods().equals(shelf.getValue().getGoods()))
+                      shelf.getValue().setFill(Color.ORANGE);
+                    else
+                      shelf.getValue().setFill(Color.BLUE);
+                 }
+             }
+
              shelfRec.setFill(Color.RED);
              highLightedShelf = (ShelfRectangle)shelfRec;
-             highLightedShelfID.setText("Selected shelf: " + shelfRec.shelfID);
+             highLightedShelfID.setText("Selected shelf's ID: " + shelfRec.shelfID +
+                                        "\nShelf's content: " + "\n " + shelfRec.getGoods() +
+                                        "\nGoods quantity: " + shelfRec.getQuantity());
           }
        };
 
@@ -164,7 +183,7 @@ public class WarehouseSimulation extends Application {
 
      // add a text which shows ID of the selected shelf
      highLightedShelfID = new Text("");
-     highLightedShelfID.setX(10);
+     highLightedShelfID.setX(this.warehouseWidth);
      highLightedShelfID.setY(20);
      group.getChildren().add(highLightedShelfID);
    }
@@ -303,6 +322,36 @@ public class WarehouseSimulation extends Application {
    }
 
 
+   public List<Pair<Integer, Pair<String, Integer>>> getAllGoods(JSONObject data) {
+     List<Pair<Integer, Pair<String, Integer>>> goods = new ArrayList<>();
+     JSONArray goodsJSON = (JSONArray) data.get("goodsList");
+     Iterator it = goodsJSON.iterator();
+
+     while(it.hasNext()) {
+       JSONObject singleGoods = (JSONObject)it.next();
+       Integer shelfID = ((Long)singleGoods.get("shelf")).intValue();
+       String goodsName = (String)singleGoods.get("goods");
+       Integer goodsQuantity = ((Long)singleGoods.get("quantity")).intValue();
+       goods.add(new Pair<>(shelfID, new Pair<>(goodsName, goodsQuantity)));
+     }
+
+     return goods;
+   }
+
+
+   public void loadGoodsToShelfs(List<Pair<Integer, Pair<String, Integer>>> goods) {
+     Iterator<Pair<Integer, Pair<String, Integer>>> it = goods.iterator();
+
+     while (it.hasNext()) {
+       Pair<Integer, Pair<String, Integer>> singleGoods = (Pair<Integer, Pair<String, Integer>>)it.next();
+       ShelfRectangle shelf = this.shelfs.get(singleGoods.getKey());
+
+       // add all goods to existing shelfs
+       shelf.addGoods(singleGoods.getValue().getKey(), singleGoods.getValue().getValue());
+     }
+   }
+
+
    @Override
    public void start(Stage primaryStage) throws Exception {
       // get names of JSON files to load simulation data
@@ -319,13 +368,13 @@ public class WarehouseSimulation extends Application {
       List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords = getAllShelfsCords(data.get(0));
       List<Pair<Point2D, Integer>> nodesCords = getAllNodesCords(data.get(0));
       List<Pair<Integer, Integer>> routes = getAllRoutes(data.get(0));
+      List<Pair<Integer, Pair<String, Integer>>> goods = getAllGoods(data.get(1));
 
-      int GUIWidth = 0; //not yet
-      int sceneWidth =  (int)Math.round(warehouseCords.getValue().getX()) +
-                        (int)Math.round(warehouseCords.getKey().getX()) +
-                        GUIWidth;
-      int sceneHeight = (int)Math.round(warehouseCords.getValue().getY()) +
-                        (int)Math.round(warehouseCords.getKey().getY());
+      int GUIWidth = 300;
+      this.warehouseWidth = (int)Math.round(warehouseCords.getValue().getX()) +
+                            (int)Math.round(warehouseCords.getKey().getX());
+      this.warehouseHeight = (int)Math.round(warehouseCords.getValue().getY()) +
+                             (int)Math.round(warehouseCords.getKey().getY());
 
       //creating a Group object
       Group group = new Group();
@@ -339,6 +388,9 @@ public class WarehouseSimulation extends Application {
       // add shelfs
       displayShelfs(group, shelfsCords);
 
+      // load goods into shelfs
+      loadGoodsToShelfs(goods);
+
       // add nodes
       displayNodes(group, nodesCords);
 
@@ -346,7 +398,7 @@ public class WarehouseSimulation extends Application {
       displayRoutes(group, routes);
 
       //Creating a Scene by passing the group object, height and width
-      Scene scene = new Scene(group ,sceneWidth, sceneHeight);
+      Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
 
       //Setting the title to Stage.
       primaryStage.setTitle("Warehouse Simulation");
