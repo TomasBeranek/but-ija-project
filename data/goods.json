@@ -1,0 +1,802 @@
+[
+  {
+    "shelf": 0,
+    "goods": "Šroub šestihranný celý závit M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 1,
+    "goods": "Šroub šestihranný celý závit M4",
+    "quantity": 200
+  },
+  {
+    "shelf": 2,
+    "goods": "Šroub šestihranný celý závit M5",
+    "quantity": 200
+  },
+  {
+    "shelf": 3,
+    "goods": "Šroub šestihranný celý závit M6",
+    "quantity": 200
+  },
+  {
+    "shelf": 4,
+    "goods": "Šroub šestihranný celý závit M8",
+    "quantity": 200
+  },
+  {
+    "shelf": 5,
+    "goods": "Šroub šestihranný celý závit M10",
+    "quantity": 200
+  },
+  {
+    "shelf": 6,
+    "goods": "Šroub šestihranný celý závit M12",
+    "quantity": 200
+  },
+  {
+    "shelf": 7,
+    "goods": "Šroub šestihranný celý závit M14",
+    "quantity": 200
+  },
+  {
+    "shelf": 8,
+    "goods": "Šroub šestihranný celý závit M16",
+    "quantity": 200
+  },
+  {
+    "shelf": 9,
+    "goods": "Šroub šestihranný celý závit M18",
+    "quantity": 200
+  },
+  {
+    "shelf": 10,
+    "goods": "Šroub šestihranný celý závit M20",
+    "quantity": 200
+  },
+  {
+    "shelf": 11,
+    "goods": "Šroub šestihranný celý závit M22",
+    "quantity": 200
+  },
+  {
+    "shelf": 12,
+    "goods": "Šroub šestihranný celý závit M24",
+    "quantity": 200
+  },
+  {
+    "shelf": 13,
+    "goods": "Šroub šestihranný celý závit M27",
+    "quantity": 200
+  },
+  {
+    "shelf": 14,
+    "goods": "Šroub šestihranný celý závit M30",
+    "quantity": 200
+  },
+  {
+    "shelf": 15,
+    "goods": "Šroub šestihranný celý závit M33",
+    "quantity": 200
+  },
+  {
+    "shelf": 16,
+    "goods": "Šroub závrtný do litiny M6 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 17,
+    "goods": "Šroub závrtný do litiny M8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 18,
+    "goods": "Šroub vratový M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 19,
+    "goods": "Šroub závrtný do litiny M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 20,
+    "goods": "Šroub závrtný do litiny M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 21,
+    "goods": "Šroub závrtný do litiny M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 22,
+    "goods": "Šroub závrtný do litiny M20 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 23,
+    "goods": "Šroub závrtný do litiny M24 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 24,
+    "goods": "Šroub závěsný M8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 25,
+    "goods": "Šroub závěsný M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 26,
+    "goods": "Šroub vratový M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 27,
+    "goods": "Šroub závěsný M14 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 28,
+    "goods": "Šroub závěsný M16 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 29,
+    "goods": "Šroub závěsný M18 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 30,
+    "goods": "Šroub šestihranný celý závit M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 31,
+    "goods": "Šroub závěsný M22 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 32,
+    "goods": "Šroub závěsný M24 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 33,
+    "goods": "Šroub závěsný M27 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 34,
+    "goods": "Šroub závěsný M30 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 35,
+    "goods": "Šroub závěsný M33 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 36,
+    "goods": "Šroub stavěcí s čípkem-inbus M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 37,
+    "goods": "Šroub stavěcí s čípkem-inbus M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 38,
+    "goods": "Šroub stavěcí s čípkem-inbus M4",
+    "quantity": 200
+  },
+  {
+    "shelf": 39,
+    "goods": "Šroub stavěcí s čípkem-inbus M5",
+    "quantity": 200
+  },
+  {
+    "shelf": 30,
+    "goods": "Šroub vratový M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 41,
+    "goods": "Šroub stavěcí s čípkem-inbus M8",
+    "quantity": 200
+  },
+  {
+    "shelf": 42,
+    "goods": "Šroub půlkulatá hlava - inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 43,
+    "goods": "Šroub stavěcí s čípkem-inbus M12",
+    "quantity": 200
+  },
+  {
+    "shelf": 44,
+    "goods": "Šroub stavěcí s čípkem-inbus M14",
+    "quantity": 200
+  },
+  {
+    "shelf": 45,
+    "goods": "Šroub stavěcí s čípkem-inbus M16",
+    "quantity": 200
+  },
+  {
+    "shelf": 46,
+    "goods": "Šroub šestihranný celý závit M16",
+    "quantity": 200
+  },
+  {
+    "shelf": 47,
+    "goods": "Šroub stavěcí s čípkem-inbus M20",
+    "quantity": 200
+  },
+  {
+    "shelf": 48,
+    "goods": "Šroub stavěcí s čípkem-inbus M22",
+    "quantity": 200
+  },
+  {
+    "shelf": 49,
+    "goods": "Šroub stavěcí s čípkem-inbus M24",
+    "quantity": 200
+  },
+  {
+    "shelf": 50,
+    "goods": "Šroub stavěcí s čípkem-inbus M27",
+    "quantity": 200
+  },
+  {
+    "shelf": 51,
+    "goods": "Šroub stavěcí s čípkem-inbus M30",
+    "quantity": 200
+  },
+  {
+    "shelf": 52,
+    "goods": "Šroub stavěcí s čípkem-inbus M33",
+    "quantity": 200
+  },
+  {
+    "shelf": 53,
+    "goods": "Šroub stavěcí plochý - drážka M2 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 54,
+    "goods": "Šroub stavěcí plochý - drážka M3 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 55,
+    "goods": "Šroub vratový M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 56,
+    "goods": "Šroub stavěcí plochý - drážka M5 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 57,
+    "goods": "Šroub stavěcí plochý - drážka M6 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 58,
+    "goods": "Šroub stavěcí plochý - drážka M8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 59,
+    "goods": "Šroub stavěcí plochý - drážka M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 60,
+    "goods": "Šroub stavěcí plochý - drážka M12 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 61,
+    "goods": "Šroub stavěcí plochý - drážka M14 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 62,
+    "goods": "Šroub stavěcí plochý - drážka M16 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 63,
+    "goods": "Šroub stavěcí plochý - drážka M18 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 64,
+    "goods": "Šroub stavěcí plochý - drážka M20 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 65,
+    "goods": "Šroub stavěcí plochý - drážka M22 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 66,
+    "goods": "Šroub stavěcí plochý - drážka M24 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 67,
+    "goods": "Šroub stavěcí plochý - drážka M27 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 68,
+    "goods": "Šroub stavěcí plochý - drážka M30 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 69,
+    "goods": "Šroub stavěcí plochý - drážka M33 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 70,
+    "goods": "Šroub TEX zápustný phillips 3,5 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 71,
+    "goods": "Šroub TEX zápustný phillips 3,9 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 72,
+    "goods": "Šroub TEX zápustný phillips 4,2 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 73,
+    "goods": "Šroub TEX zápustný phillips 4,8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 74,
+    "goods": "Šroub TEX zápustný phillips 6,3 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 75,
+    "goods": "Šroub zápustný phillips M8 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 76,
+    "goods": "Šroub zápustný phillips M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 77,
+    "goods": "Šroub zápustný phillips M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 78,
+    "goods": "Šroub zápustný phillips M14 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 79,
+    "goods": "Šroub zápustný phillips M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 80,
+    "goods": "Šroub zápustný phillips M18 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 81,
+    "goods": "Šroub zápustný phillips M20 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 82,
+    "goods": "Šroub vratový M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 83,
+    "goods": "Šroub zápustný phillips M24 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 84,
+    "goods": "Šroub zápustný phillips M27 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 85,
+    "goods": "Šroub zápustný phillips M30 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 86,
+    "goods": "Šroub zápustný phillips M33 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 87,
+    "goods": "Šroub čočková hlava - drážka M4 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 30,
+    "goods": "Šroub šestihranný celý závit M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 89,
+    "goods": "Šroub čočková hlava - drážka M6 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 90,
+    "goods": "Šroub čočková hlava - drážka M8 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 91,
+    "goods": "Šroub čočková hlava - drážka M10 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 92,
+    "goods": "Šroub čočková hlava - drážka M12 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 93,
+    "goods": "Šroub čočková hlava - drážka M14 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 94,
+    "goods": "Šroub stavěcí s čípkem-inbus M3",
+    "quantity": 200
+  },
+  {
+    "shelf": 95,
+    "goods": "Šroub čočková hlava - drážka M18 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 96,
+    "goods": "Šroub čočková hlava - drážka M20 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 97,
+    "goods": "Šroub čočková hlava - drážka M22 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 98,
+    "goods": "Šroub čočková hlava - drážka M24 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 99,
+    "goods": "Šroub zápustný inbus M8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 100,
+    "goods": "Šroub zápustný inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 101,
+    "goods": "Šroub zápustný inbus M12 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 102,
+    "goods": "Šroub zápustný inbus M14 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 103,
+    "goods": "Šroub zápustný inbus M16 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 104,
+    "goods": "Šroub zápustný inbus M18 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 105,
+    "goods": "Šroub zápustný s drážkou M4 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 106,
+    "goods": "Šroub zápustný s drážkou M5 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 107,
+    "goods": "Šroub zápustný s drážkou M6 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 108,
+    "goods": "Šroub zápustný s drážkou M8 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 109,
+    "goods": "Šroub čočková hlava - drážka M4 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 110,
+    "goods": "Šroub zápustný s drážkou M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 111,
+    "goods": "Šroub zápustný s drážkou M14 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 112,
+    "goods": "Šroub zápustný s drážkou M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 113,
+    "goods": "Šroub zápustný s drážkou M18 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 114,
+    "goods": "Šroub zápustný s drážkou M20 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 115,
+    "goods": "Šroub zápustný s drážkou M22 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 116,
+    "goods": "Šroub šestihranný celý závit M16",
+    "quantity": 200
+  },
+  {
+    "shelf": 117,
+    "goods": "Šroub zápustný s drážkou M27 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 118,
+    "goods": "Šroub zápustný s drážkou M30 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 119,
+    "goods": "Šroub zápustný s drážkou M33 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 120,
+    "goods": "Šroub vratový M8 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 121,
+    "goods": "Šroub vratový M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 122,
+    "goods": "Šroub zápustný inbus M14 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 123,
+    "goods": "Šroub vratový M14 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 124,
+    "goods": "Šroub vratový M16 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 125,
+    "goods": "Šroub vratový M18 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 126,
+    "goods": "Šroub vratový M20 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 127,
+    "goods": "Šroub čočková hlava - drážka M4 mosaz",
+    "quantity": 200
+  },
+  {
+    "shelf": 128,
+    "goods": "Šroub vratový M24 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 129,
+    "goods": "Šroub samořezný s drážkou 3,5 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 130,
+    "goods": "Šroub samořezný s drážkou 3,9 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 131,
+    "goods": "Šroub zápustný s drážkou M14 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 132,
+    "goods": "Šroub samořezný s drážkou 4,8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 133,
+    "goods": "Šroub samořezný s drážkou 6,3 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 134,
+    "goods": "Šroub půlkulatá hlava - inbus M6 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 135,
+    "goods": "Šroub půlkulatá hlava - inbus M8 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 136,
+    "goods": "Šroub půlkulatá hlava - inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 137,
+    "goods": "Šroub půlkulatá hlava - inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 138,
+    "goods": "Šroub půlkulatá hlava - inbus M14 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 139,
+    "goods": "Šroub půlkulatá hlava - inbus M16 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 140,
+    "goods": "Šroub půlkulatá hlava - inbus M18 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 141,
+    "goods": "Šroub půlkulatá hlava - inbus M20 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 142,
+    "goods": "Šroub půlkulatá hlava - inbus M22 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 143,
+    "goods": "Šroub půlkulatá hlava - inbus M24 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 144,
+    "goods": "Šroub půlkulatá hlava - inbus M27 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 145,
+    "goods": "Šroub vratový M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 146,
+    "goods": "Šroub půlkulatá hlava - inbus M33 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 147,
+    "goods": "Šroub půlkulatá hlava - inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 148,
+    "goods": "Šroub inbus půlkulatý s límcem M8 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 149,
+    "goods": "Šroub inbus půlkulatý s límcem M10 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 150,
+    "goods": "Šroub inbus půlkulatý s límcem M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 151,
+    "goods": "Šroub inbus půlkulatý s límcem M14 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 152,
+    "goods": "Šroub vratový M12 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 153,
+    "goods": "Šroub inbus půlkulatý s límcem M18 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 154,
+    "goods": "Šroub inbus půlkulatý s límcem M20 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 155,
+    "goods": "Šroub inbus půlkulatý s límcem M22 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 156,
+    "goods": "Šroub inbus půlkulatý s límcem M24 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 157,
+    "goods": "Šroub inbus půlkulatý s límcem M27 nerez A2",
+    "quantity": 200
+  },
+  {
+    "shelf": 158,
+    "goods": "Šroub půlkulatá hlava - inbus M10 pozink",
+    "quantity": 200
+  },
+  {
+    "shelf": 159,
+    "goods": "Šroub inbus půlkulatý s límcem M33 nerez A2",
+    "quantity": 200
+  }
+]

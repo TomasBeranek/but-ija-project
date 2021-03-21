@@ -1,3 +1,4 @@
 build/
 dest/
 data/JSONgenerator.py
+data/JSONvalidator.py
