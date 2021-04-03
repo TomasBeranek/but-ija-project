@@ -11,6 +11,7 @@ package ija.project.warehouse;
 
 import ija.project.warehouse.ShelfRectangle;
 import ija.project.warehouse.NodeCircle;
+import ija.project.warehouse.Order;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -50,6 +51,9 @@ public class WarehouseSimulation extends Application {
    private boolean debug = false;
    private int warehouseWidth = 0;
    private int warehouseHeight = 0;
+   private List<Order> orders = new ArrayList<>();
+
+   private Integer currentEpochTime = 0;
 
 
    private List<JSONObject> loadJSONData(List<String> fileNames) {
@@ -294,7 +298,7 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   public void displayRoutes(Group group, List<Pair<Integer, Integer>> routes) {
+   private void displayRoutes(Group group, List<Pair<Integer, Integer>> routes) {
      Iterator<Pair<Integer, Integer>> it = routes.iterator();
 
      while (it.hasNext()) {
@@ -322,7 +326,7 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   public List<Pair<Integer, Pair<String, Integer>>> getAllGoods(JSONObject data) {
+   private List<Pair<Integer, Pair<String, Integer>>> getAllGoods(JSONObject data) {
      List<Pair<Integer, Pair<String, Integer>>> goods = new ArrayList<>();
      JSONArray goodsJSON = (JSONArray) data.get("goodsList");
      Iterator it = goodsJSON.iterator();
@@ -339,7 +343,7 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   public void loadGoodsToShelfs(List<Pair<Integer, Pair<String, Integer>>> goods) {
+   private void loadGoodsToShelfs(List<Pair<Integer, Pair<String, Integer>>> goods) {
      Iterator<Pair<Integer, Pair<String, Integer>>> it = goods.iterator();
 
      while (it.hasNext()) {
@@ -349,6 +353,37 @@ public class WarehouseSimulation extends Application {
        // add all goods to existing shelfs
        shelf.addGoods(singleGoods.getValue().getKey(), singleGoods.getValue().getValue());
      }
+   }
+
+
+   private List<Order> getAllOrders(JSONObject data) {
+     List<Order> orders = new ArrayList<>();
+     JSONArray ordersJSON = (JSONArray) data.get("ordersList");
+     Iterator it = ordersJSON.iterator();
+
+     while(it.hasNext()) {
+       JSONObject singleOrder = (JSONObject)it.next();
+       Integer startEpochTime = ((Long)singleOrder.get("startEpochTime")).intValue();
+       List<Pair<String, Integer>> goods = new ArrayList<>();
+
+       JSONArray goodsJSON = (JSONArray) singleOrder.get("goods");
+       Iterator goodsIt = goodsJSON.iterator();
+
+       while(goodsIt.hasNext()) {
+         JSONObject singleGoods = (JSONObject)goodsIt.next();
+         String goodsName = (String)singleGoods.get("name");
+         Integer goodsQuantity = ((Long)singleGoods.get("quantity")).intValue();
+         goods.add(new Pair<>(goodsName, goodsQuantity));
+         System.out.println(startEpochTime);
+         System.out.println(goodsName);
+         System.out.println(goodsQuantity);
+       }
+
+
+       orders.add(new Order(startEpochTime, goods));
+     }
+
+     return orders;
    }
 
 
@@ -363,12 +398,14 @@ public class WarehouseSimulation extends Application {
 
       List<JSONObject> data = this.loadJSONData(args);
 
+      // loading data from JSON files
       Pair<Point2D, Point2D> warehouseCords = getWarehouseCords(data.get(0));
       Pair<Point2D, Point2D> dispensingPointCords = getDispensingPointCords(data.get(0));
       List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords = getAllShelfsCords(data.get(0));
       List<Pair<Point2D, Integer>> nodesCords = getAllNodesCords(data.get(0));
       List<Pair<Integer, Integer>> routes = getAllRoutes(data.get(0));
       List<Pair<Integer, Pair<String, Integer>>> goods = getAllGoods(data.get(1));
+      this.orders = getAllOrders(data.get(2));
 
       int GUIWidth = 300;
       this.warehouseWidth = (int)Math.round(warehouseCords.getValue().getX()) +
@@ -408,6 +445,9 @@ public class WarehouseSimulation extends Application {
 
       //Displaying the contents of the stage
       primaryStage.show();
+
+      //run the simulation
+      
    }
 
 
