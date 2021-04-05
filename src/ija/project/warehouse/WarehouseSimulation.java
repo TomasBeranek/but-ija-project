@@ -28,7 +28,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.*;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.*;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
@@ -374,9 +374,6 @@ public class WarehouseSimulation extends Application {
          String goodsName = (String)singleGoods.get("name");
          Integer goodsQuantity = ((Long)singleGoods.get("quantity")).intValue();
          goods.add(new Pair<>(goodsName, goodsQuantity));
-         System.out.println(startEpochTime);
-         System.out.println(goodsName);
-         System.out.println(goodsQuantity);
        }
 
 
@@ -384,6 +381,11 @@ public class WarehouseSimulation extends Application {
      }
 
      return orders;
+   }
+
+
+   private void drawCurrentState() {
+     // update cart cords
    }
 
 
@@ -447,7 +449,9 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
 
       //run the simulation
-      
+      ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+      Runnable drawState = () -> drawCurrentState();
+      ScheduledFuture<?> drawStateHandle = scheduler.scheduleAtFixedRate(drawState, 0, 1000, TimeUnit.MILLISECONDS);
    }
 
 

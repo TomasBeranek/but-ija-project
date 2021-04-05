@@ -11,13 +11,17 @@
   <property name="goods.data" value="${data.dir}/goods.json"/>
   <property name="orders.data" value="${data.dir}/orders.json"/>
 
-  <path id="lib.path">
+  <path id="lib.compile.path">
+      <fileset dir="lib" includes="*.jar"/>
+  </path>
+
+  <path id="lib.runtime.path">
+      <fileset dir="dest" includes="WarehouseSimulation.jar"/>
       <fileset dir="lib" includes="*.jar"/>
   </path>
 
   <target name="run" depends="compile">
-    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes">
-      <jvmarg line="-cp dest/WarehouseSimulation.jar:lib/json-simple-1.1.jar:lib/javafx.controls.jar:lib/javafx.graphics.jar:lib/javafx.base.jar --module-path lib --add-modules=javafx.controls"/>
+    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
       <arg value="${warehouse.data}"/>
       <arg value="${goods.data}"/>
       <arg value="${orders.data}"/>
@@ -25,8 +29,7 @@
   </target>
 
   <target name="debug" depends="compile">
-    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes">
-      <jvmarg line="-cp dest/WarehouseSimulation.jar:lib/json-simple-1.1.jar:lib/javafx.controls.jar:lib/javafx.graphics.jar:lib/javafx.base.jar --module-path lib --add-modules=javafx.controls"/>
+    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
       <arg value="${warehouse.data}"/>
       <arg value="${goods.data}"/>
       <arg value="${orders.data}"/>
@@ -36,7 +39,7 @@
 
   <target name="compile" depends="clean">
     <mkdir dir="${build.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.path">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
     </javac>
 
