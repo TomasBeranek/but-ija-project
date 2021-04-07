@@ -12,12 +12,11 @@
   <property name="orders.data" value="${data.dir}/orders.json"/>
 
   <path id="lib.compile.path">
-      <fileset dir="lib" includes="*.jar"/>
+      <fileset dir="${lib.dir}" includes="*.jar"/>
   </path>
 
   <path id="lib.runtime.path">
-      <fileset dir="dest" includes="WarehouseSimulation.jar"/>
-      <fileset dir="lib" includes="*.jar"/>
+      <fileset dir="${dest.dir}" includes="${jar.name}"/>
   </path>
 
   <target name="run" depends="compile">
@@ -48,6 +47,7 @@
       <manifest>
         <attribute name="Main-Class" value="ija.project.warehouse.WarehouseSimulation"/>
       </manifest>
+      <zipfileset src="${lib.dir}/json-simple-1.1.jar" includes="**/*.java **/*.class"/>
     </jar>
   </target>
 
