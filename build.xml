@@ -6,7 +6,7 @@
   <property name="src.dir" value="src"/>
   <property name="doc.dir" value="doc"/>
   <property name="data.dir" value="data"/>
-  <property name="jar.name" value="WarehouseSimulation.jar"/>
+  <property name="jar.name" value="ija-app.jar"/>
   <property name="warehouse.data" value="${data.dir}/warehouse.json"/>
   <property name="goods.data" value="${data.dir}/goods.json"/>
   <property name="orders.data" value="${data.dir}/orders.json"/>
@@ -37,12 +37,10 @@
   </target>
 
   <target name="compile" depends="clean">
-    <mkdir dir="${build.dir}"/>
     <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
     </javac>
 
-    <mkdir dir="${dest.dir}"/>
     <jar destfile="${dest.dir}/${jar.name}" basedir="${build.dir}">
       <manifest>
         <attribute name="Main-Class" value="ija.project.warehouse.WarehouseSimulation"/>
@@ -52,7 +50,9 @@
   </target>
 
   <target name="clean">
-    <delete dir="${build.dir}"/>
-    <delete dir="${dest.dir}"/>
+    <delete includeemptydirs="true">
+      <fileset dir="${build.dir}" includes="**/*"/>
+      <fileset dir="${dest.dir}" includes="**/*"/>
+    </delete>
   </target>
 </project>

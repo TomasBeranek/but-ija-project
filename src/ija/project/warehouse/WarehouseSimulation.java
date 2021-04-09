@@ -54,6 +54,7 @@ public class WarehouseSimulation extends Application {
    private List<Order> orders = new ArrayList<>();
 
    private Integer currentEpochTime = 0;
+   private Integer timeSpeed = 1;
 
 
    private List<JSONObject> loadJSONData(List<String> fileNames) {
@@ -76,7 +77,7 @@ public class WarehouseSimulation extends Application {
        data.add(goodsData);
      } catch(Exception e) {
        System.err.printf("ERROR: failed to parse JSON file '%s'", fileNames.get(1));
-       //System.exit(1);
+       System.exit(1);
      }
 
      try {
@@ -84,7 +85,7 @@ public class WarehouseSimulation extends Application {
        data.add(ordersData);
      } catch(Exception e) {
        System.err.printf("ERROR: failed to parse JSON file '%s'", fileNames.get(2));
-       //System.exit(1);
+       System.exit(1);
      }
 
      return data;
@@ -386,6 +387,8 @@ public class WarehouseSimulation extends Application {
 
    private void drawCurrentState() {
      // update cart cords
+
+     this.currentEpochTime += this.timeSpeed;
    }
 
 

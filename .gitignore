@@ -1,4 +1,6 @@
-build/
-dest/
+build/*
+dest/*
+!build
+!dest
 data/JSONgenerator.py
 data/JSONvalidator.py
