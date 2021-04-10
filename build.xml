@@ -10,6 +10,7 @@
   <property name="warehouse.data" value="${data.dir}/warehouse.json"/>
   <property name="goods.data" value="${data.dir}/goods.json"/>
   <property name="orders.data" value="${data.dir}/orders.json"/>
+  <property name="download.script" value="${lib.dir}/get-libs.sh"/>
 
   <path id="lib.compile.path">
       <fileset dir="${lib.dir}" includes="*.jar"/>
@@ -36,7 +37,7 @@
     </java>
   </target>
 
-  <target name="compile" depends="clean">
+  <target name="compile" depends="clean, download-libs">
     <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
     </javac>
@@ -54,5 +55,15 @@
       <fileset dir="${build.dir}" includes="**/*"/>
       <fileset dir="${dest.dir}" includes="**/*"/>
     </delete>
+  </target>
+
+  <target name="download-libs" depends="check-json-simple" unless="${json-simple.exists}">
+    <exec executable="/bin/sh">
+      <arg value="${download.script}"/>
+    </exec>
+  </target>
+
+  <target name="check-json-simple">
+    <available property="json-simple.exists" file="${lib.dir}/json-simple-1.1.jar"/>
   </target>
 </project>
