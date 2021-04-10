@@ -394,6 +394,9 @@ public class WarehouseSimulation extends Application {
 
    @Override
    public void start(Stage primaryStage) throws Exception {
+      // close the whole app after closing the window
+      primaryStage.setOnCloseRequest(e -> System.exit(0));
+
       // get names of JSON files to load simulation data
       List<String> args = getParameters().getRaw();
 
