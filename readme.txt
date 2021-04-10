@@ -5,7 +5,7 @@ warehouse. The carts are using the Floyd–Warshall algorithm for finding the sh
 path between shelves with the goods and the dispensing point. Each order has assigned
 a single cart. An order can be specified in order.json file or GUI of a simulation.
 The simulation supports interactive interventions like - closing an alley, adding
-an order and setting or changing the speed of the simulation. The system is fully
+an order and changing the speed or the time of the simulation. The system is fully
 customizable, a user can define a custom floor plan, orders and goods. The system
 consists of:
   -- dispensing point
