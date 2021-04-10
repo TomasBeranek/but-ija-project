@@ -1,12 +1,3 @@
-/**
-* This file contains an implementation of WarehouseSimulation class with the
-* main method. This class creates a GUI and controls the simulation.
-*
-* @author  Tomas Beranek (xberan46)
-* @author  Simon Slobodnik (xslobo06)
-* @since   19.3.2021
-*/
-
 package ija.project.warehouse;
 
 import ija.project.warehouse.ShelfRectangle;
@@ -40,7 +31,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
-
+/** Controls the warehouse simulation. Sets the simulation time and speed. Loads
+ *  a floor plan of a warehouse, goods and orders. Creates a GUI and updates the
+ *  simulation if an interactive interventions like closing an alley, adding an
+ *  order or changing the speed/time of the simulation happens.
+ *
+ * @author Tomas Beranek (xberan46)
+ */
 public class WarehouseSimulation extends Application {
    private ShelfRectangle highLightedShelf = null;
    private Text highLightedShelfID;
@@ -56,8 +53,15 @@ public class WarehouseSimulation extends Application {
    private Integer currentEpochTime = 0;
    private Integer timeSpeed = 1;
 
-
-   private List<JSONObject> loadJSONData(List<String> fileNames) {
+   /** Loads files into JSON objects.
+    *
+    * @param fileNames The list of filenames:
+    *           0) a floor plan
+    *           1) goods
+    *           2) orders
+    * @return The list of created JSONObjects.
+    */
+   public List<JSONObject> loadJSONData(List<String> fileNames) {
      JSONParser parser = new JSONParser();
      JSONObject warehouseData = new JSONObject();
      JSONObject goodsData;
@@ -92,7 +96,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private Pair<Point2D, Point2D> getWarehouseCords(JSONObject data) {
+   /** Loads the warheouse position from a JSONObject that contains a floor plan.
+    *
+    * @param data JSONObject with a floor plan of a warehouse.
+    * @return A loaded pair of warehouse coordinates (left top, right bottom).
+    */
+   public Pair<Point2D, Point2D> getWarehouseCords(JSONObject data) {
       JSONArray lefttopJSON = (JSONArray)((JSONObject)data.get("warehouse")).get("lefttop");
       Point2D lefttop = new Point2D(((Long)lefttopJSON.get(0)).doubleValue(), ((Long)lefttopJSON.get(1)).doubleValue());
 
@@ -103,7 +112,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private Pair<Point2D, Point2D> getDispensingPointCords(JSONObject data) {
+   /** Loads the dispensing point position from a JSONObject that contains
+    *  a floor plan.
+    *
+    * @param data JSONObject with a floor plan of a warehouse.
+    * @return A loaded pair of dispensing point coordinates (left top, right bottom)
+    */
+   public Pair<Point2D, Point2D> getDispensingPointCords(JSONObject data) {
       JSONArray lefttopJSON = (JSONArray)((JSONObject)data.get("dispensingPoint")).get("lefttop");
       Point2D lefttop = new Point2D(((Long)lefttopJSON.get(0)).doubleValue(), ((Long)lefttopJSON.get(1)).doubleValue());
 
@@ -114,7 +129,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private List<Pair<Pair<Point2D, Point2D>, Integer>> getAllShelfsCords(JSONObject data) {
+   /** Loads all the shelves data from a JSONObject that contains a floor plan.
+    *
+    * @param data JSONObject with a floor plan of a warehouse.
+    * @return A list of loaded shelves informations. Each shelf's information contains --
+    *     left top point, right bottom point and ID.
+    */
+   public List<Pair<Pair<Point2D, Point2D>, Integer>> getAllShelfsCords(JSONObject data) {
      List<Pair<Pair<Point2D, Point2D>, Integer>> shelfCords = new ArrayList<>();
      JSONArray shelfsJSON = (JSONArray)data.get("shelfs");
      Iterator it = shelfsJSON.iterator();
@@ -127,7 +148,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private Pair<Pair<Point2D, Point2D>, Integer> getShelfCords(JSONObject data) {
+   /** Loads the shelf's position from a JSONObject that contains a single shelf.
+    *
+    * @param data JSONObject with a single shelf.
+    * @return Loaded shelf's information -- left top point, right bottom point and ID.
+    */
+   public Pair<Pair<Point2D, Point2D>, Integer> getShelfCords(JSONObject data) {
       JSONArray lefttopJSON = (JSONArray)data.get("lefttop");
       Point2D lefttop = new Point2D(((Long)lefttopJSON.get(0)).doubleValue(), ((Long)lefttopJSON.get(1)).doubleValue());
 
@@ -138,7 +164,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void displayShelfs(Group group, List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords) {
+   /** Displays all the shelfs in the window.
+    *
+    * @param group The group object to which a shelf is added to be visible.
+    * @param shelfsCords A list of shelves informations -- left top point,
+    *    right bottom point and ID.
+    */
+   public void displayShelfs(Group group, List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords) {
      Iterator<Pair<Pair<Point2D, Point2D>, Integer>> it = shelfsCords.iterator();
 
      while(it.hasNext()){
@@ -194,7 +226,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private List<Pair<Point2D, Integer>> getAllNodesCords(JSONObject data) {
+   /** Loads all the nodes data from a JSONObject that contains a floor plan.
+    *
+    * @param data JSONObject with a floor plan of a warehouse.
+    * @return A list of loaded nodes informations. Each node's information contains --
+    *     position and ID.
+    */
+   public List<Pair<Point2D, Integer>> getAllNodesCords(JSONObject data) {
      List<Pair<Point2D, Integer>> nodesCords = new ArrayList<>();
      JSONArray nodesJSON = (JSONArray)data.get("nodes");
      Iterator it = nodesJSON.iterator();
@@ -207,7 +245,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private Pair<Point2D, Integer> getNodeCords(JSONObject data) {
+   /** Loads the node's position from a JSONObject that contains a single node.
+    *
+    * @param data JSONObject with a single node.
+    * @return Loaded node's information -- position and ID.
+    */
+   public Pair<Point2D, Integer> getNodeCords(JSONObject data) {
      JSONArray positionJSON = (JSONArray)data.get("position");
      Point2D position = new Point2D(((Long)positionJSON.get(0)).doubleValue(), ((Long)positionJSON.get(1)).doubleValue());
 
@@ -215,7 +258,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void displayNodes(Group group, List<Pair<Point2D, Integer>> nodesCords){
+   /** Displays all the nodes in the window if the program is in debug mode,
+    *  otherwise only prepare them for the simulation.
+    *
+    * @param group The group object to which a node is added to be visible.
+    * @param nodesCords A list of nodes informations -- position and ID.
+    */
+   public void displayNodes(Group group, List<Pair<Point2D, Integer>> nodesCords){
      Iterator<Pair<Point2D, Integer>> it = nodesCords.iterator();
 
      while(it.hasNext()){
@@ -257,7 +306,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void displayWarehouse(Group group, Pair<Point2D, Point2D> warehouseCords) {
+   /** Displays the warehouse background in the window.
+    *
+    * @param group The group object to which a warehouse is added to be visible.
+    * @param warehouseCords The coordinates of the warehouse background.
+    */
+   public void displayWarehouse(Group group, Pair<Point2D, Point2D> warehouseCords) {
      Rectangle warehouseRect = new Rectangle(
        (int)Math.round(warehouseCords.getKey().getX()),
        (int)Math.round(warehouseCords.getKey().getY()),
@@ -271,7 +325,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void displayDispensingPoint(Group group, Pair<Point2D, Point2D> dispensingPointCords) {
+   /** Displays the dispensing point in the window.
+    *
+    * @param group The group object to which a dispensing point is added to be visible.
+    * @param dispensingPointCords The coordinates of the dispensing point.
+    */
+   public void displayDispensingPoint(Group group, Pair<Point2D, Point2D> dispensingPointCords) {
      Rectangle dispensingPointRec = new Rectangle(
        (int)Math.round(dispensingPointCords.getKey().getX()),
        (int)Math.round(dispensingPointCords.getKey().getY()),
@@ -285,7 +344,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private List<Pair<Integer, Integer>> getAllRoutes(JSONObject data) {
+   /** Loads all the routes between nodes from a JSONObject that contains a floor
+    *  plan.
+    *
+    * @param data JSONObject with a floor plan of a warehouse.
+    * @return A list of loaded routes specified as -- node1ID and node2ID.
+    */
+   public List<Pair<Integer, Integer>> getAllRoutes(JSONObject data) {
      List<Pair<Integer, Integer>> routes = new ArrayList<>();
      JSONArray routesJSON = (JSONArray)data.get("routes");
      Iterator it = routesJSON.iterator();
@@ -299,7 +364,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void displayRoutes(Group group, List<Pair<Integer, Integer>> routes) {
+   /** Displays all the routes in the window if the program is in debug mode,
+    *  otherwise only prepare them for the simulation.
+    *
+    * @param group The group object to which a route is added to be visible.
+    * @param routes A list of routes spcified as -- node1ID and node2ID.
+    */
+   public void displayRoutes(Group group, List<Pair<Integer, Integer>> routes) {
      Iterator<Pair<Integer, Integer>> it = routes.iterator();
 
      while (it.hasNext()) {
@@ -327,7 +398,13 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private List<Pair<Integer, Pair<String, Integer>>> getAllGoods(JSONObject data) {
+   /** Loads all the goods from a JSONObject that contains a goods info.
+    *
+    * @param data JSONObject with a goods info.
+    * @return A list of loaded goods informations. Each item's information contains --
+    *     name, shelfID and quantity.
+    */
+   public List<Pair<Integer, Pair<String, Integer>>> getAllGoods(JSONObject data) {
      List<Pair<Integer, Pair<String, Integer>>> goods = new ArrayList<>();
      JSONArray goodsJSON = (JSONArray) data.get("goodsList");
      Iterator it = goodsJSON.iterator();
@@ -344,7 +421,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void loadGoodsToShelfs(List<Pair<Integer, Pair<String, Integer>>> goods) {
+   /** Loads all the goods into shelves.
+    *
+    * @param goods A list of goods informations. Each item's information contains --
+    *     name, shelfID and quantity.
+    */
+   public void loadGoodsToShelfs(List<Pair<Integer, Pair<String, Integer>>> goods) {
      Iterator<Pair<Integer, Pair<String, Integer>>> it = goods.iterator();
 
      while (it.hasNext()) {
@@ -357,7 +439,12 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private List<Order> getAllOrders(JSONObject data) {
+   /** Loads all the orders data from a JSONObject that contains an orders info.
+    *
+    * @param data JSONObject with an orders info.
+    * @return A list of loaded orders.
+    */
+   public List<Order> getAllOrders(JSONObject data) {
      List<Order> orders = new ArrayList<>();
      JSONArray ordersJSON = (JSONArray) data.get("ordersList");
      Iterator it = ordersJSON.iterator();
@@ -385,13 +472,18 @@ public class WarehouseSimulation extends Application {
    }
 
 
-   private void drawCurrentState() {
+   /** Controls the simulation -- increments time and redraws the canvas.
+    */
+   public void drawCurrentState() {
      // update cart cords
 
      this.currentEpochTime += this.timeSpeed;
    }
 
-
+   /** Creates a GUI, loads data and starts the simulation.
+    *
+    * @param primaryStage The main stage.
+    */
    @Override
    public void start(Stage primaryStage) throws Exception {
       // close the whole app after closing the window
@@ -461,6 +553,10 @@ public class WarehouseSimulation extends Application {
    }
 
 
+   /** The entry point of the simulation.
+    *
+    * @param args Program arguments.
+    */
    public static void main(String args[]){
       launch(args);
    }

@@ -37,7 +37,7 @@
     </java>
   </target>
 
-  <target name="doc">
+  <target name="doc" depends="clean-doc">
     <javadoc sourcepath="${src.dir}" destdir="${doc.dir}">
       <classpath>
         <fileset dir="${lib.dir}">
@@ -64,6 +64,11 @@
     <delete includeemptydirs="true">
       <fileset dir="${build.dir}" includes="**/*"/>
       <fileset dir="${dest.dir}" includes="**/*"/>
+    </delete>
+  </target>
+
+  <target name="clean-doc">
+    <delete includeemptydirs="true">
       <fileset dir="${doc.dir}">
         <include name="**/*"/>
         <exclude name="architektura.pdf"/>
