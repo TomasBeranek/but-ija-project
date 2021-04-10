@@ -37,7 +37,7 @@
     </java>
   </target>
 
-  <target name="compile" depends="clean, download-libs">
+  <target name="compile" depends="create-build, create-dest, clean, download-libs">
     <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
     </javac>
@@ -63,7 +63,23 @@
     </exec>
   </target>
 
+  <target name="create-build" depends="check-build-dir" unless="${build-dir.exists}">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <target name="create-dest" depends="check-dest-dir" unless="${dest-dir.exists}">
+    <mkdir dir="${dest.dir}"/>
+  </target>
+
   <target name="check-json-simple">
     <available property="json-simple.exists" file="${lib.dir}/json-simple-1.1.jar"/>
+  </target>
+
+  <target name="check-build-dir">
+    <available property="build-dir.exists" file="${build.dir}"/>
+  </target>
+
+  <target name="check-dest-dir">
+    <available property="dest-dir.exists" file="${dest.dir}"/>
   </target>
 </project>
