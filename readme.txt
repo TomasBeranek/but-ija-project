@@ -34,6 +34,8 @@ An example of each file can be found in data/.
 Requirements
   -- Ant (>= 1.10.7)
   -- Java SE 8 (or OpenJDK|Java SE >8 with JavaFX)
+  -- wget (>= 1.20.3)
+  -- unzip (>= 6.00)
 
 
 Usage
