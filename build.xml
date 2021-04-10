@@ -37,6 +37,16 @@
     </java>
   </target>
 
+  <target name="doc">
+    <javadoc sourcepath="${src.dir}" destdir="${doc.dir}">
+      <classpath>
+        <fileset dir="${lib.dir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javadoc>
+  </target>
+
   <target name="compile" depends="create-build, create-dest, clean, download-libs">
     <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
@@ -54,6 +64,10 @@
     <delete includeemptydirs="true">
       <fileset dir="${build.dir}" includes="**/*"/>
       <fileset dir="${dest.dir}" includes="**/*"/>
+      <fileset dir="${doc.dir}">
+        <include name="**/*"/>
+        <exclude name="architektura.pdf"/>
+      </fileset>
     </delete>
   </target>
 
