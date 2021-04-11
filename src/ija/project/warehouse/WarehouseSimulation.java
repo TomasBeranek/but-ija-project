@@ -133,10 +133,10 @@ public class WarehouseSimulation extends Application {
     *
     * @param data JSONObject with a floor plan of a warehouse.
     * @return A list of loaded shelves informations. Each shelf's information contains --
-    *     left top point, right bottom point and ID.
+    *     left top point, right bottom point, ID and nodeID.
     */
-   public List<Pair<Pair<Point2D, Point2D>, Integer>> getAllShelfsCords(JSONObject data) {
-     List<Pair<Pair<Point2D, Point2D>, Integer>> shelfCords = new ArrayList<>();
+   public List<Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer>> getAllShelfsCords(JSONObject data) {
+     List<Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer>> shelfCords = new ArrayList<>();
      JSONArray shelfsJSON = (JSONArray)data.get("shelfs");
      Iterator it = shelfsJSON.iterator();
 
@@ -151,16 +151,20 @@ public class WarehouseSimulation extends Application {
    /** Loads the shelf's position from a JSONObject that contains a single shelf.
     *
     * @param data JSONObject with a single shelf.
-    * @return Loaded shelf's information -- left top point, right bottom point and ID.
+    * @return Loaded shelf's information -- left top point, right bottom point, ID
+    *    and nodeID.
     */
-   public Pair<Pair<Point2D, Point2D>, Integer> getShelfCords(JSONObject data) {
+   public Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer> getShelfCords(JSONObject data) {
       JSONArray lefttopJSON = (JSONArray)data.get("lefttop");
       Point2D lefttop = new Point2D(((Long)lefttopJSON.get(0)).doubleValue(), ((Long)lefttopJSON.get(1)).doubleValue());
 
       JSONArray rightbottomJSON = (JSONArray)data.get("rightbottom");
       Point2D rightbottom = new Point2D(((Long)rightbottomJSON.get(0)).doubleValue(), ((Long)rightbottomJSON.get(1)).doubleValue());
 
-      return new Pair<>(new Pair<>(lefttop, rightbottom), ((Long)data.get("id")).intValue());
+      Integer shelfID = ((Long)data.get("id")).intValue();
+      Integer nodeID = ((Long)data.get("node")).intValue();
+
+      return new Pair<>(new Pair<>(new Pair<>(lefttop, rightbottom), shelfID), nodeID);
    }
 
 
@@ -170,17 +174,18 @@ public class WarehouseSimulation extends Application {
     * @param shelfsCords A list of shelves informations -- left top point,
     *    right bottom point and ID.
     */
-   public void displayShelfs(Group group, List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords) {
-     Iterator<Pair<Pair<Point2D, Point2D>, Integer>> it = shelfsCords.iterator();
+   public void displayShelfs(Group group, List<Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer>> shelfsCords) {
+     Iterator<Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer>> it = shelfsCords.iterator();
 
      while(it.hasNext()){
-       Pair<Pair<Point2D, Point2D>, Integer> shelfInfo = (Pair<Pair<Point2D, Point2D>, Integer>)it.next();
-       Pair<Point2D, Point2D> shelfCords = shelfInfo.getKey();
+       Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer> shelfInfo = it.next();
+       Pair<Point2D, Point2D> shelfCords = shelfInfo.getKey().getKey();
        ShelfRectangle shelfRec = new ShelfRectangle(
          (int)Math.round(shelfCords.getKey().getX()),
          (int)Math.round(shelfCords.getKey().getY()),
          (int)Math.round(shelfCords.getValue().getX()) - (int)Math.round(shelfCords.getKey().getX()),
          (int)Math.round(shelfCords.getValue().getY()) - (int)Math.round(shelfCords.getKey().getY()),
+         shelfInfo.getKey().getValue(),
          shelfInfo.getValue());
        shelfRec.setFill(Color.BLUE);
        shelfRec.setStrokeWidth(4);
@@ -208,6 +213,7 @@ public class WarehouseSimulation extends Application {
              shelfRec.setFill(Color.RED);
              highLightedShelf = (ShelfRectangle)shelfRec;
              highLightedShelfID.setText("Selected shelf's ID: " + shelfRec.shelfID +
+                                        "\nAssociated node's ID: " + shelfRec.nodeID +
                                         "\nShelf's content: " + "\n " + shelfRec.getGoods() +
                                         "\nGoods quantity: " + shelfRec.getQuantity());
           }
@@ -501,7 +507,7 @@ public class WarehouseSimulation extends Application {
       // loading data from JSON files
       Pair<Point2D, Point2D> warehouseCords = getWarehouseCords(data.get(0));
       Pair<Point2D, Point2D> dispensingPointCords = getDispensingPointCords(data.get(0));
-      List<Pair<Pair<Point2D, Point2D>, Integer>> shelfsCords = getAllShelfsCords(data.get(0));
+      List<Pair<Pair<Pair<Point2D, Point2D>, Integer>, Integer>> shelfsCords = getAllShelfsCords(data.get(0));
       List<Pair<Point2D, Integer>> nodesCords = getAllNodesCords(data.get(0));
       List<Pair<Integer, Integer>> routes = getAllRoutes(data.get(0));
       List<Pair<Integer, Pair<String, Integer>>> goods = getAllGoods(data.get(1));

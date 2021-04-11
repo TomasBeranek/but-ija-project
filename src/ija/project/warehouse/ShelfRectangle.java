@@ -10,6 +10,7 @@ import java.util.*;
  */
 public class ShelfRectangle extends Rectangle {
   public int shelfID = -1;
+  public int nodeID = -1;
   private String goodsName;
   private Integer goodsQuantity;
 
@@ -20,10 +21,12 @@ public class ShelfRectangle extends Rectangle {
    * @param w The shelf’s width.
    * @param h The shelf’s height.
    * @param id The shelf’s ID.
+   * @param nodeID The associated node's ID.
    */
-  public ShelfRectangle(int x, int y, int w, int h, int id) {
+  public ShelfRectangle(int x, int y, int w, int h, int ID, int nodeID) {
     super(x, y, w, h);
-    this.shelfID = id;
+    this.shelfID = ID;
+    this.nodeID = nodeID;
   }
 
 
