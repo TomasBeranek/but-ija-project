@@ -14,7 +14,7 @@ public class PathFinder {
 
 
   public List<Pair<Integer, Pair<String, Integer>>> findPath(
-          List<Pair<String, Integer>> order,
+          Order order,
           Hashtable<Integer, ShelfRectangle> shelfs) {
       // calculates the optimal path for a cart
 

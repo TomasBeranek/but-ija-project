@@ -3,6 +3,7 @@ package ija.project.warehouse;
 import ija.project.warehouse.ShelfRectangle;
 import ija.project.warehouse.NodeCircle;
 import ija.project.warehouse.Order;
+import ija.project.warehouse.PathFinder;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -49,9 +50,12 @@ public class WarehouseSimulation extends Application {
    private int warehouseWidth = 0;
    private int warehouseHeight = 0;
    private List<Order> orders = new ArrayList<>();
+   private Group group = new Group();
 
    private Integer currentEpochTime = 0;
    private Integer timeSpeed = 1;
+   private PathFinder pathFinder;
+
 
    /** Loads files into JSON objects.
     *
@@ -482,7 +486,25 @@ public class WarehouseSimulation extends Application {
     */
    public void drawCurrentState() {
      // update cart cords
+     //cycle through orders
+     System.out.println("Time: " + currentEpochTime);
 
+     for (int i = 0; i < orders.size(); i++) {
+       System.out.println("\nOrder: " + i);
+       if (orders.get(i).isActive(this.currentEpochTime)){
+         if (orders.get(i).hasCart()){
+           //draw the cart
+           orders.get(i).drawCart(this.currentEpochTime, nodes);
+         }
+         else{
+           //create the new cart and draw it
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i), shelfs));
+           orders.get(i).drawCart(this.currentEpochTime, nodes);
+         }
+       }
+     }
+
+     //increment simulation time
      this.currentEpochTime += this.timeSpeed;
    }
 
@@ -519,9 +541,6 @@ public class WarehouseSimulation extends Application {
       this.warehouseHeight = (int)Math.round(warehouseCords.getValue().getY()) +
                              (int)Math.round(warehouseCords.getKey().getY());
 
-      //creating a Group object
-      Group group = new Group();
-
       // warehouse background
       displayWarehouse(group, warehouseCords);
 
@@ -543,7 +562,7 @@ public class WarehouseSimulation extends Application {
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
 
-      //Setting the title to Stage.
+      //Setting the title to Stage
       primaryStage.setTitle("Warehouse Simulation");
 
       //Adding the scene to Stage
@@ -551,6 +570,9 @@ public class WarehouseSimulation extends Application {
 
       //Displaying the contents of the stage
       primaryStage.show();
+
+      //initialize PathFinder -- creates a matrix of distances
+      pathFinder = new PathFinder(nodes);
 
       //run the simulation
       ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
