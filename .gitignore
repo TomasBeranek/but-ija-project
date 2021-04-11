@@ -7,3 +7,5 @@ data/JSONvalidator.py
 lib/json-simple-1.1.jar
 doc/*
 !doc/architektura.pdf
+
+.idea/workspace.xml
