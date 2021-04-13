@@ -3,7 +3,7 @@ package ija.project.warehouse;
 import ija.project.warehouse.ShelfRectangle;
 import ija.project.warehouse.NodeCircle;
 import ija.project.warehouse.Order;
-import ija.project.warehouse.PathFinder;
+//import ija.project.warehouse.PathFinder;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -54,7 +54,7 @@ public class WarehouseSimulation extends Application {
 
    private Integer currentEpochTime = 0;
    private Integer timeSpeed = 1;
-   private PathFinder pathFinder;
+   //private PathFinder pathFinder;
 
 
    /** Loads files into JSON objects.
@@ -484,21 +484,22 @@ public class WarehouseSimulation extends Application {
 
    /** Controls the simulation -- increments time and redraws the canvas.
     */
-   public void drawCurrentState() {
-     // update cart cords
+   /*public void drawCurrentState() {
      //cycle through orders
      System.out.println("Time: " + currentEpochTime);
 
      for (int i = 0; i < orders.size(); i++) {
-       System.out.println("\nOrder: " + i);
+       System.out.println("Order: " + i);
        if (orders.get(i).isActive(this.currentEpochTime)){
          if (orders.get(i).hasCart()){
            //draw the cart
+           System.out.println("Má vozík");
            orders.get(i).drawCart(this.currentEpochTime, nodes);
          }
          else{
            //create the new cart and draw it
-           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i), shelfs));
+           System.out.println("Nemá vozík");
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0));
            orders.get(i).drawCart(this.currentEpochTime, nodes);
          }
        }
@@ -506,7 +507,7 @@ public class WarehouseSimulation extends Application {
 
      //increment simulation time
      this.currentEpochTime += this.timeSpeed;
-   }
+   }*/
 
    /** Creates a GUI, loads data and starts the simulation.
     *
@@ -559,6 +560,26 @@ public class WarehouseSimulation extends Application {
       // add routes
       displayRoutes(group, routes);
 
+      // show a simple help
+      Text textHelp = new Text( "Strucny popisek\n"+
+                                "-- veskery podklad (vse co je videt) je\n"+
+                                "   plne konfigurovatelne pomoci JSON souboru\n"+
+                                "   v data/:\n"+
+                                "-- je mozne kliknout na polici (modra)\n"+
+                                "   pro zobrazeni:\n"+
+                                "\t-- jejiho ID\n"+
+                                "\t-- ID prirazeneho uzlu\n"+
+                                "\t-- jejiho obsah\n"+
+                                "\t-- a polic se stejnym obsahem (zlute)\n"+
+                                "\t   napr. police s ID 0 (vlevo nahore)\n"+
+                                "-- je mozne kliknout na uzel (cervene\n"+
+                                "   tecky) pro zobrazeni:\n"+
+                                "\t-- jeho ID\n"+
+                                "\t-- a jejo sousedu\n");
+      textHelp.setX(this.warehouseWidth);
+      textHelp.setY(130);
+      group.getChildren().add(textHelp);
+
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
 
@@ -572,12 +593,17 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
 
       //initialize PathFinder -- creates a matrix of distances
-      pathFinder = new PathFinder(nodes);
+      //pathFinder = new PathFinder(nodes);
 
       //run the simulation
+      /*Runnable drawState = new Runnable(){
+        @Override
+        public void run(){
+          drawCurrentState();
+        }
+      };
       ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-      Runnable drawState = () -> drawCurrentState();
-      ScheduledFuture<?> drawStateHandle = scheduler.scheduleAtFixedRate(drawState, 0, 1000, TimeUnit.MILLISECONDS);
+      scheduler.scheduleAtFixedRate(drawState, 0, 1000, TimeUnit.MILLISECONDS);*/
    }
 
 

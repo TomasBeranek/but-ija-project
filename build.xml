@@ -20,15 +20,7 @@
       <fileset dir="${dest.dir}" includes="${jar.name}"/>
   </path>
 
-  <target name="run" depends="compile">
-    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
-      <arg value="${warehouse.data}"/>
-      <arg value="${goods.data}"/>
-      <arg value="${orders.data}"/>
-    </java>
-  </target>
-
-  <target name="debug" depends="compile">
+  <target name="run">
     <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
       <arg value="${warehouse.data}"/>
       <arg value="${goods.data}"/>

@@ -12,7 +12,7 @@ import javafx.scene.Group;
  */
 public class Order {
 
-  private List<Pair<String, Integer>> goods = new ArrayList<>();
+  public List<Pair<String, Integer>> goods = new ArrayList<>();
   private Integer startEpochTime = 0;
   private Integer endEpochTime = Integer.MAX_VALUE;
   private List<Pair<Integer, Pair<String, Integer>>> path = new ArrayList<>();
@@ -57,20 +57,34 @@ public class Order {
 
   /** Passes the given sequence of nodes (path) to the cart.
    *
+   * @param group The group object to which a cart is added to be visible.
    * @param path The sequence of nodes (path).
    */
   public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path) {
-    this.cart = new Cart(0, 0, 0);
-    group.getChildren().add(this.cart);
+    this.cart = new Cart(0.0f, 0.0f, 0.0f);
+    try {
+      group.getChildren().add(this.cart);
+    } catch(Exception e) {
+      System.out.println(e);
+    }
     this.cart.addPath(path);
   }
 
 
+  /** Check is the order has assigned cart.
+   *
+   * @return True - if the order has assigned cart.
+   */
   public boolean hasCart(){
     return this.cart != null;
   }
 
 
+  /** Signals to the cart to update it's position.
+   *
+   * @param currentEpochTime Current simulation time.
+   * @param nodes The list of all the nodes.
+   */
   public void drawCart(Integer currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
     this.cart.updatePosition(currentEpochTime, nodes);
   }

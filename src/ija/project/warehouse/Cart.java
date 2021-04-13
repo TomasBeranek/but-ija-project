@@ -19,13 +19,13 @@ public class Cart extends Circle {
 
 
   /**
-   * @param x The node's x coordinate.
-   * @param y The node's y coordinate.
-   * @param r The node's radius for a visualization.
-   * @param id The node's ID.
+   * @param x The cart's x coordinate.
+   * @param y The cart's y coordinate.
+   * @param r The cart's radius for a visualization.
    */
   public Cart(float x, float y, float r){
     super(x, y, r);
+    System.out.println("Vozík vytvořen");
   }
 
 
@@ -41,6 +41,7 @@ public class Cart extends Circle {
   /** Updates cart's position to current the given time.
    *
    * @param currentEpochTime The current epoch time.
+   * @param nodes The list of all the nodes.
    */
   public void updatePosition(Integer currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
     int nodeID = this.path.get(0).getKey();
