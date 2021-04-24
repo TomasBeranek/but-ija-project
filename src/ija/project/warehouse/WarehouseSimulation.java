@@ -6,10 +6,12 @@ import ija.project.warehouse.Order;
 import ija.project.warehouse.PathFinder;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import java.util.Date;
 import javafx.util.*;
 import java.util.*;
 import javafx.geometry.Point2D;
@@ -490,15 +492,16 @@ public class WarehouseSimulation extends Application {
      System.out.println("Time: " + currentEpochTime);
 
      for (int i = 0; i < orders.size(); i++) {
-       System.out.println("\nOrder: " + i);
+       System.out.println("\nOrder: " + i + "  ");
        if (orders.get(i).isActive(this.currentEpochTime)){
+         System.out.println("Active");
          if (orders.get(i).hasCart()){
            //draw the cart
            orders.get(i).drawCart(this.currentEpochTime, nodes);
          }
          else{
            //create the new cart and draw it
-           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i), shelfs));
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes);
            orders.get(i).drawCart(this.currentEpochTime, nodes);
          }
        }
@@ -575,9 +578,23 @@ public class WarehouseSimulation extends Application {
       pathFinder = new PathFinder(nodes);
 
       //run the simulation
+      //ugly,ugly nesting
       ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-      Runnable drawState = () -> drawCurrentState();
-      ScheduledFuture<?> drawStateHandle = scheduler.scheduleAtFixedRate(drawState, 0, 1000, TimeUnit.MILLISECONDS);
+
+      Runnable updater = new Runnable() {
+        @Override
+        public void run() {
+          Runnable drawState = new Runnable() {
+            @Override
+            public void run() {
+                drawCurrentState();
+            }
+          };
+          Platform.runLater(drawState);
+        }
+      };
+
+      scheduler.scheduleAtFixedRate(updater, 0, this.timeSpeed*40, TimeUnit.MILLISECONDS);
    }
 
 

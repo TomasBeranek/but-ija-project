@@ -2,6 +2,8 @@ package ija.project.warehouse;
 
 import javafx.scene.shape.Circle;
 import java.util.*;
+import javafx.geometry.Point2D;
+
 
 /** Represents a node on which a cart can travel. The node holds the information
  *  about all of it's current reachable neighbours. The class is inherited from
@@ -85,5 +87,16 @@ public class NodeCircle extends Circle {
    */
   public boolean addNeighbour(int id) {
     return this.neighbours.add(id);
+  }
+
+
+  public int distance(NodeCircle p) {
+    int x = p.getX();
+    int y = p.getY();
+
+    Point2D p1 = new Point2D(this.x, this.y);
+    Point2D p2 = new Point2D(x, y);
+
+    return (int)p1.distance(p2);
   }
 }

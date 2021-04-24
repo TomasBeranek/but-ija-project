@@ -20,7 +20,7 @@ public class ShelfRectangle extends Rectangle {
    * @param y The shelf’s y coordinate of the top left corner.
    * @param w The shelf’s width.
    * @param h The shelf’s height.
-   * @param id The shelf’s ID.
+   * @param ID The shelf’s ID.
    * @param nodeID The associated node's ID.
    */
   public ShelfRectangle(int x, int y, int w, int h, int ID, int nodeID) {
