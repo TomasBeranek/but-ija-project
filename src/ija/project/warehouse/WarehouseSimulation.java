@@ -18,9 +18,11 @@ import javafx.geometry.Point2D;
 import java.lang.Math;
 import javafx.scene.shape.*;
 import javafx.scene.paint.Color;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.*;
+import javafx.scene.control.Button;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
@@ -48,14 +50,15 @@ public class WarehouseSimulation extends Application {
    private Text highLightedNodeID;
    private Hashtable<Integer, NodeCircle> nodes = new Hashtable<>();
    private Hashtable<Integer, ShelfRectangle> shelfs = new Hashtable<>();
+   private Hashtable<String, Line> routes = new Hashtable<>();
    private boolean debug = false;
    private int warehouseWidth = 0;
    private int warehouseHeight = 0;
    private List<Order> orders = new ArrayList<>();
    private Group group = new Group();
 
-   private Integer currentEpochTime = 0;
-   private Integer timeSpeed = 1;
+   private Long currentEpochTime = 0L; // in ms
+   private Long updateSpeed = 20L; // in ms
    private PathFinder pathFinder;
 
 
@@ -284,21 +287,26 @@ public class WarehouseSimulation extends Application {
        NodeCircle nodeCircle = new NodeCircle(
          (float)Math.round(nodeInfo.getKey().getX()),
          (float)Math.round(nodeInfo.getKey().getY()),
-         5.0f,
+         0.0f,
          nodeInfo.getValue());
 
+       nodeCircle.setFill(Color.RED);
+
        if (debug){
-         nodeCircle.setFill(Color.RED);
          nodeCircle.setStrokeWidth(0);
+         nodeCircle.setRadius(5);
 
          //Creating the mouse event handler
          EventHandler<MouseEvent> nodeClickHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent e) {
-               if (highLightedNode != null)
-                 highLightedNode.setFill(Color.RED);
+               for(Integer nodeID : nodes.keySet()){
+                 nodes.get(nodeID).setFill(Color.RED);
+                 nodes.get(nodeID).setRadius(5);
+               }
 
                nodeCircle.setFill(Color.BLUE);
+               nodeCircle.setRadius(7);
                highLightedNode = (NodeCircle)nodeCircle;
                highLightedNodeID.setText("Selected node: " + nodeCircle.ID+ " neighbours: " + nodeCircle.getNeighbours());
             }
@@ -397,9 +405,28 @@ public class WarehouseSimulation extends Application {
          line.setEndX(end.getX());
          line.setEndY(end.getY());
          line.setFill(Color.RED);
-         line.setStrokeWidth(1);
+         line.setStrokeWidth(3);
          line.setStroke(Color.RED);
 
+         EventHandler<MouseEvent> routeClickHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+              if (line.getStroke().equals(Color.RED)){
+                line.setStroke(Color.BLACK);
+              } else if (line.getStroke().equals(Color.BLACK)){
+                line.setStroke(Color.RED);
+              } else if (line.getStroke().equals(Color.GREY)){
+                line.setStroke(Color.DARKRED);
+              } else if (line.getStroke().equals(Color.DARKRED)){
+                line.setStroke(Color.GREY);
+              }
+            }
+         };
+
+         line.addEventFilter(MouseEvent.MOUSE_CLICKED, routeClickHandler);
+
+         this.routes.put("" + start.ID + " " + end.ID, line);
+         this.routes.put("" + end.ID + " " + start.ID, line);
          group.getChildren().add(line);
        }
 
@@ -463,7 +490,7 @@ public class WarehouseSimulation extends Application {
 
      while(it.hasNext()) {
        JSONObject singleOrder = (JSONObject)it.next();
-       Integer startEpochTime = ((Long)singleOrder.get("startEpochTime")).intValue();
+       Long startEpochTime = (Long)singleOrder.get("startEpochTime");
        List<Pair<String, Integer>> goods = new ArrayList<>();
 
        JSONArray goodsJSON = (JSONArray) singleOrder.get("goods");
@@ -495,20 +522,51 @@ public class WarehouseSimulation extends Application {
        System.out.println("\nOrder: " + i + "  ");
        if (orders.get(i).isActive(this.currentEpochTime)){
          System.out.println("Active");
-         if (orders.get(i).hasCart()){
-           //draw the cart
-           orders.get(i).drawCart(this.currentEpochTime, nodes);
+         if (!orders.get(i).hasCart()){
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs);
          }
-         else{
-           //create the new cart and draw it
-           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes);
-           orders.get(i).drawCart(this.currentEpochTime, nodes);
+
+         //draw the cart
+         if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
+           //we need to recalculate the path
+           //zbytek cesty, order, shelves
+           //List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
+           //orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs));
          }
        }
      }
 
      //increment simulation time
-     this.currentEpochTime += this.timeSpeed;
+     this.currentEpochTime += this.updateSpeed;
+   }
+
+   public void closeBlackRoutes(){
+     for(String routeKey : this.routes.keySet()) {
+       if (this.routes.get(routeKey).getStroke().equals(Color.BLACK)){
+         int startNodeID = Integer.parseInt(routeKey.split(" ")[0]);
+         int endNodeID = Integer.parseInt(routeKey.split(" ")[1]);
+
+         this.nodes.get(startNodeID).removeNeighbour(endNodeID);
+         this.nodes.get(endNodeID).removeNeighbour(startNodeID);
+
+         this.routes.get(routeKey).setStroke(Color.GREY);
+       }
+     }
+   }
+
+
+   public void openDarkredRoutes(){
+     for(String routeKey : this.routes.keySet()) {
+       if (this.routes.get(routeKey).getStroke().equals(Color.DARKRED)){
+         int startNodeID = Integer.parseInt(routeKey.split(" ")[0]);
+         int endNodeID = Integer.parseInt(routeKey.split(" ")[1]);
+
+         this.nodes.get(startNodeID).addNeighbour(endNodeID);
+         this.nodes.get(endNodeID).addNeighbour(startNodeID);
+
+         this.routes.get(routeKey).setStroke(Color.RED);
+       }
+     }
    }
 
    /** Creates a GUI, loads data and starts the simulation.
@@ -562,6 +620,24 @@ public class WarehouseSimulation extends Application {
       // add routes
       displayRoutes(group, routes);
 
+      // move every node to front
+      for(Integer nodeID : this.nodes.keySet()) {
+        nodes.get(nodeID).toFront();
+      }
+
+      // display a button for route closing
+      Button closeRouteButton = new Button("Close route");
+      closeRouteButton.setPrefHeight(40);
+      closeRouteButton.setPrefWidth(100);
+      closeRouteButton.setLayoutX(this.warehouseWidth);
+      closeRouteButton.setLayoutY(300);
+      closeRouteButton.setOnAction(actionEvent -> {
+          closeBlackRoutes();
+          openDarkredRoutes();
+          pathFinder.setMatrix(nodes);
+      });
+      group.getChildren().add(closeRouteButton);
+
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
 
@@ -576,6 +652,7 @@ public class WarehouseSimulation extends Application {
 
       //initialize PathFinder -- creates a matrix of distances
       pathFinder = new PathFinder(nodes);
+      //pathFinder = new PathFinder(nodes, shelfs);
 
       //run the simulation
       //ugly,ugly nesting
@@ -594,7 +671,7 @@ public class WarehouseSimulation extends Application {
         }
       };
 
-      scheduler.scheduleAtFixedRate(updater, 0, this.timeSpeed*40, TimeUnit.MILLISECONDS);
+      scheduler.scheduleAtFixedRate(updater, 0, this.updateSpeed, TimeUnit.MILLISECONDS);
    }
 
 

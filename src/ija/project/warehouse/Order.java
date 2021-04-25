@@ -13,17 +13,17 @@ import javafx.scene.Group;
 public class Order {
 
   public List<Pair<String, Integer>> goods = new ArrayList<>();
-  private Integer startEpochTime = 0;
-  private Integer endEpochTime = Integer.MAX_VALUE;
+  private Long startEpochTime = 0L;
+  private Long endEpochTime = Long.MAX_VALUE;
   private List<Pair<Integer, Pair<String, Integer>>> path = new ArrayList<>();
-  private Cart cart = null;
+  public Cart cart = null;
 
 
   /**
    * @param epochTime The orders’s start time.
    * @param goods The list of goods.
    */
-  public Order(Integer epochTime, List<Pair<String, Integer>> goods) {
+  public Order(Long epochTime, List<Pair<String, Integer>> goods) {
     this.startEpochTime = epochTime;
     this.goods = goods;
   }
@@ -34,7 +34,7 @@ public class Order {
    * @param currentEpochTime The current time of the simulation.
    * @return True - if the order has already been processed.
    */
-  public boolean isFinished(Integer currentEpochTime) {
+  public boolean isFinished(Long currentEpochTime) {
     if (currentEpochTime >= endEpochTime)
       return true;
     else
@@ -47,7 +47,7 @@ public class Order {
    * @param currentEpochTime The current time of the simulation.
    * @return True - if the order has already started and hasn't finished yet.
    */
-  public boolean isActive(Integer currentEpochTime) {
+  public boolean isActive(Long currentEpochTime) {
     if (currentEpochTime >= startEpochTime && !this.isFinished(currentEpochTime))
       return true;
     else
@@ -61,11 +61,11 @@ public class Order {
    * @param path The sequence of nodes (path).
    * @param nodes The list of all the nodes.
    */
-  public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes) {
+  public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelves) {
     int startX = nodes.get(path.get(0).getKey()).getX();
     int startY = nodes.get(path.get(0).getKey()).getY();
     System.out.println("Start node: " + path.get(0).getKey());
-    this.cart = new Cart(startX, startY, 0);
+    this.cart = new Cart(startX, startY, 0, shelves);
     group.getChildren().add(this.cart);
     this.cart.addPath(path, nodes);
   }
@@ -85,10 +85,21 @@ public class Order {
    * @param currentEpochTime Current simulation time.
    * @param nodes The list of all the nodes.
    */
-  public void drawCart(Integer currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
+  public boolean drawCart(Long currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
     //if update position returns false, it was the last update, which means
     //that the order is finished
-    if (!this.cart.updatePosition(currentEpochTime, nodes))
+    String rc = this.cart.updatePosition(currentEpochTime, nodes);
+    if (rc == "Finished"){
       this.endEpochTime = currentEpochTime;
+      return true;
+    } else if (rc == "Success"){
+      //do nothing
+      return true;
+    } else if (rc == "Stopped"){
+      //we need to recalculate the path
+      return false;
+    }
+
+    return true;
   }
 }

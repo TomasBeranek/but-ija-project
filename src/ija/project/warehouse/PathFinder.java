@@ -88,7 +88,7 @@ public class PathFinder {
   }
 
   /** Insert new edge to matrix distance and next
-   * 
+   *
    * @param u Number of first node
    * @param v Number of second node
    * @param distance Distance between given nodes
@@ -101,7 +101,7 @@ public class PathFinder {
     this.next[v][u] = u;
   }
   /** Search for nearest node
-   * 
+   *
    * @param requiredNodes Selected nodes containing the searched goods
    * @param actualNode Number of node
    * @return Number of node with the smallest distance between him and actual node
@@ -122,9 +122,9 @@ public class PathFinder {
     return node;
   }
 
-  /** Find all nodes which are next to shelf with wanted goods and they process them into a sorted form 
+  /** Find all nodes which are next to shelf with wanted goods and they process them into a sorted form
    *  ideal for picking up goods, without a path between the found nodes
-   * 
+   *
    *  @param order List of orders with pairs of goods name and their number
    *  @param shelfs Hashtable of shelfs ID and ShelfRectangles
    *  @param actualNode The node number where the cart is currently located
@@ -137,7 +137,7 @@ public class PathFinder {
     Set<Integer> Keys = shelfs.keySet();
     for(int i: Keys){
       for(int j = 0; j < order.size(); j++){
-        
+
         if(shelfs.get(i).getGoods().equals(order.get(j).getKey())){
           requiredNodes.put(shelfs.get(i).nodeID,i);
           break;
@@ -175,7 +175,7 @@ public class PathFinder {
   }
 
   /** Get path between two given nodes, without first and last node
-   * 
+   *
    *  @param u Number of start node
    *  @param v Number of target node
    *  @return Path between start and target nodes
@@ -199,7 +199,7 @@ public class PathFinder {
   }
 
   /** Call all functions for setting distance matrix and next matrix
-   *  
+   *
    *  @param nodes Hashrable of nodes ID and NodeCircle
    */
   public void setMatrix(Hashtable<Integer, NodeCircle> nodes){
@@ -210,7 +210,7 @@ public class PathFinder {
   }
 
   /** Finding complet the shortest path for a given order with data about collection of goods
-   *  
+   *
    *  @param order List of orders with pairs of goods name and their number
    *  @param shelfs Hashtable of shelfs ID and ShelfRectangles
    *  @param actualNode The node number where the cart is currently located

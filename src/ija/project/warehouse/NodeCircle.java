@@ -90,6 +90,16 @@ public class NodeCircle extends Circle {
   }
 
 
+  /** Removes a node from the node's neighbours.
+   *
+   * @param id The neighbour's ID.
+   * @return True - if the neighbour was present.
+   */
+  public boolean removeNeighbour(int id) {
+    return this.neighbours.remove(id);
+  }
+
+
   public int distance(NodeCircle p) {
     int x = p.getX();
     int y = p.getY();

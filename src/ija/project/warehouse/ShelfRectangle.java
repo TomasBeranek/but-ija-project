@@ -50,11 +50,29 @@ public class ShelfRectangle extends Rectangle {
   }
 
 
+  /** Gets the ID of the assigned node.
+   *
+   * @return The ID of the assigned node.
+   */
+  public int getNode() {
+    return this.nodeID;
+  }
+
+
   /** Gets the quantity of the goods stored in the shelf.
    *
    * @return The quantity of the goods.
    */
   public Integer getQuantity() {
     return this.goodsQuantity;
+  }
+
+
+  /** Deacreases the quantity of the goods stored in the shelf by toRemove.
+   *
+   * @param toRemove The new quantity of the goods.
+   */
+  public void decreaseQuantity(int toRemove) {
+    this.goodsQuantity -= toRemove;
   }
 }
