@@ -529,9 +529,8 @@ public class WarehouseSimulation extends Application {
          //draw the cart
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
-           //zbytek cesty, order, shelves
-           //List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
-           //orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs));
+           List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
+           orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs), nodes);
          }
        }
      }
@@ -651,11 +650,8 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
 
       //initialize PathFinder -- creates a matrix of distances
-      pathFinder = new PathFinder(nodes);
-      //pathFinder = new PathFinder(nodes, shelfs);
-=======
+      //pathFinder = new PathFinder(nodes);
       pathFinder = new PathFinder(nodes, shelfs);
->>>>>>> Stashed changes
 
       //run the simulation
       //ugly,ugly nesting

@@ -102,4 +102,8 @@ public class Order {
 
     return true;
   }
+
+  public void updateCartPath(List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes){
+    this.cart.addPath(path, nodes);
+  }
 }

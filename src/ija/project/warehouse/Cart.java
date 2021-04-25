@@ -78,6 +78,9 @@ public class Cart extends Circle {
     this.pathLen = getPathLen(nodes);
     this.nodes = nodes;
 
+    this.lastVisitedNodeIndex = 0;
+    this.traveledLen = 0;
+     
     // handler cannot reach 'this' variable
     Cart thisCopy = this;
 
