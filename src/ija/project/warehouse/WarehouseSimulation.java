@@ -653,6 +653,9 @@ public class WarehouseSimulation extends Application {
       //initialize PathFinder -- creates a matrix of distances
       pathFinder = new PathFinder(nodes);
       //pathFinder = new PathFinder(nodes, shelfs);
+=======
+      pathFinder = new PathFinder(nodes, shelfs);
+>>>>>>> Stashed changes
 
       //run the simulation
       //ugly,ugly nesting
