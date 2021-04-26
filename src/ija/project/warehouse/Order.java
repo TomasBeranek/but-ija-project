@@ -64,8 +64,12 @@ public class Order {
   public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelves) {
     int startX = nodes.get(path.get(0).getKey()).getX();
     int startY = nodes.get(path.get(0).getKey()).getY();
-    System.out.println("Start node: " + path.get(0).getKey());
-    this.cart = new Cart(startX, startY, 0, shelves);
+
+    //remove the old cart if there was any
+    if (this.cart != null)
+      group.getChildren().remove(this.cart);
+
+    this.cart = new Cart(startX, startY, 0, shelves, startEpochTime);
     group.getChildren().add(this.cart);
     this.cart.addPath(path, nodes);
   }

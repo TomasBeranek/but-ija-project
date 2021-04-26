@@ -30,6 +30,7 @@ public class Cart extends Circle {
   private int lastVisitedNodeIndex = -1;
   private Hashtable<Integer, NodeCircle> nodes;
   private boolean cartIsActive = false;
+  private Long startEpochTime = 0L;
 
 
   /**
@@ -37,11 +38,12 @@ public class Cart extends Circle {
    * @param y The cart's y coordinate.
    * @param r The cart's radius for a visualization.
    */
-  public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves){
+  public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves, Long startEpochTime){
     super(x, y, r);
     //this.setCache(true);
     //this.setCacheHint(CacheHint.SPEED);
     this.shelves = shelves;
+    this.startEpochTime = startEpochTime;
   }
 
 
@@ -80,7 +82,7 @@ public class Cart extends Circle {
 
     this.lastVisitedNodeIndex = 0;
     this.traveledLen = 0;
-     
+
     // handler cannot reach 'this' variable
     Cart thisCopy = this;
 
@@ -117,21 +119,14 @@ public class Cart extends Circle {
    * @param nodes The list of all the nodes.
    */
   public String updatePosition(Long currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
-    if (this.lastEpochTime == 0)
+    if (this.lastEpochTime == 0){
       this.lastEpochTime = currentEpochTime; //this the first update called
-
+      this.traveledLen = (int)(((currentEpochTime - this.startEpochTime)/1000.0)*this.speed);
+    }
     int nodeID = this.path.get(0).getKey();
-
-    //DEBUG:
-    ////System.out.println(this.pathLen);
-    //for (int i = 0; i < this.path.size(); i++){
-    //  //System.out.print(this.path.get(i).getKey() + "  ");
-    //}
-    ////System.out.println("");
 
     this.setRadius(10); //make sure it is visible
     this.setFill(Color.GREY);
-
 
     //index in path not node ID!
     Pair<Integer, Integer> p = getLastVisitedNodeIndexAndLen(nodes);
@@ -142,12 +137,6 @@ public class Cart extends Circle {
     Long duration = currentEpochTime - this.lastEpochTime;
     int distanceToTravel = (int)((duration/1000.0)*this.speed);
     this.lastEpochTime = currentEpochTime;
-
-
-    //System.out.println("Last node: " + lastNode);
-    //System.out.println("Next node: " + nextNode);
-    //System.out.println("Traveled:  " + this.traveledLen);
-    //System.out.println("Last node ID:  " + nodes.get(this.path.get(lastVisitedNodeIndex).getKey()).ID);
 
     // 3 things can happen:
     //  1) the next position will be still between the same two points
@@ -167,14 +156,10 @@ public class Cart extends Circle {
         this.highlightedShelfID = -1;
       }
 
-      //System.out.println("Moving between nodes");
 
       float percentage = (float)(this.traveledLen + distanceToTravel - lastVisitedNodeDistance) / lastNode.distance(nextNode);
       int nextPositionX = (int)((nextNode.getX() - lastNode.getX()) * percentage) + lastNode.getX();
       int nextPositionY = (int)((nextNode.getY() - lastNode.getY()) * percentage) + lastNode.getY();
-      //System.out.println("X: " + nextPositionX);
-      //System.out.println("Y: " + nextPositionY);
-      //System.out.println("Percentage: " + percentage);
 
       this.setCenterX(nextPositionX);
       this.setCenterY(nextPositionY);
@@ -194,11 +179,9 @@ public class Cart extends Circle {
           this.highlightedShelfID = -1;
         }
 
-        //System.out.println("Jumping over node");
         //substract remaining distance to the next node
         distanceToTravel -= lastNode.distance(nextNode) - (this.traveledLen - lastVisitedNodeDistance);
         this.traveledLen += lastNode.distance(nextNode) - (this.traveledLen - lastVisitedNodeDistance);
-        //System.out.println("Distance to travel: " + distanceToTravel);
 
         lastVisitedNodeIndex++;
         lastVisitedNodeDistance = this.traveledLen;
@@ -209,12 +192,6 @@ public class Cart extends Circle {
         int nextPositionX = (int)((nextNode.getX() - lastNode.getX()) * percentage) + lastNode.getX();
         int nextPositionY = (int)((nextNode.getY() - lastNode.getY()) * percentage) + lastNode.getY();
 
-        //System.out.println("Shifted last node: " + lastNode);
-        //System.out.println("Shifted next node: " + nextNode);
-        //System.out.println("X: " + nextPositionX);
-        //System.out.println("Y: " + nextPositionY);
-        //System.out.println("Percentage: " + percentage);
-
         // check if on the last visisited node is goods that we have to pick up
         if (this.path.get(lastVisitedNodeIndex).getValue().getKey() != ""){
           //wait
@@ -223,17 +200,9 @@ public class Cart extends Circle {
           int quantity = this.path.get(lastVisitedNodeIndex).getValue().getValue();
           String goodsName = this.path.get(lastVisitedNodeIndex).getValue().getKey();
           int lastNodeID = this.path.get(lastVisitedNodeIndex).getKey();
-          System.out.println("Removing goods: " + goodsName + " quantinty: " +
-              quantity + " goods from shelf on node: " + lastNodeID);
 
           //find shelf by nodeID and goods name and pick up goods
           for(Integer shelfID : this.shelves.keySet()) {
-            System.out.println(this.shelves.get(shelfID).getGoods() + "   "
-                + this.shelves.get(shelfID).getNode());
-            System.out.println(goodsName + "   "
-                + lastNodeID);
-            System.out.println();
-
             if (this.shelves.get(shelfID).getGoods().equals(goodsName)
                 && this.shelves.get(shelfID).getNode() == lastNodeID){
                   //pick the goods form the shelf
@@ -244,8 +213,6 @@ public class Cart extends Circle {
                   this.shelves.get(shelfID).setStrokeWidth(6);
                   this.shelves.get(shelfID).setStroke(Color.GREY);
                   this.highlightedShelfID = shelfID;
-
-                  System.out.println("Removing: " + quantity + " goods from shelf: " + shelfID);
                 }
           }
         }

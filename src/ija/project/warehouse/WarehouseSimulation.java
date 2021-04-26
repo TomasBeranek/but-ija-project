@@ -25,6 +25,7 @@ import javafx.scene.text.*;
 import javafx.scene.control.Button;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
+import javafx.scene.control.TextField;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
@@ -50,16 +51,20 @@ public class WarehouseSimulation extends Application {
    private Text highLightedNodeID;
    private Hashtable<Integer, NodeCircle> nodes = new Hashtable<>();
    private Hashtable<Integer, ShelfRectangle> shelfs = new Hashtable<>();
+   private Hashtable<Integer, Integer> shelfsInitialQuantity = new Hashtable<>();
    private Hashtable<String, Line> routes = new Hashtable<>();
    private boolean debug = false;
    private int warehouseWidth = 0;
    private int warehouseHeight = 0;
    private List<Order> orders = new ArrayList<>();
    private Group group = new Group();
+   private Text timer;
+   private Text speed;
 
    private Long currentEpochTime = 0L; // in ms
    private Long updateSpeed = 20L; // in ms
    private PathFinder pathFinder;
+   private TextField setTimeInput;
 
 
    /** Loads files into JSON objects.
@@ -516,12 +521,10 @@ public class WarehouseSimulation extends Application {
    public void drawCurrentState() {
      // update cart cords
      //cycle through orders
-     System.out.println("Time: " + currentEpochTime);
+     this.timer.setText(String.format("%02d:%02d:%02d", (this.currentEpochTime/3600000)%24, (this.currentEpochTime/60000)%60, (this.currentEpochTime/1000)%60));
 
      for (int i = 0; i < orders.size(); i++) {
-       System.out.println("\nOrder: " + i + "  ");
        if (orders.get(i).isActive(this.currentEpochTime)){
-         System.out.println("Active");
          if (!orders.get(i).hasCart()){
            orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs);
          }
@@ -619,23 +622,124 @@ public class WarehouseSimulation extends Application {
       // add routes
       displayRoutes(group, routes);
 
+      // save initial shelves quantity
+      for(Integer shelfID : this.shelfs.keySet()) {
+        this.shelfsInitialQuantity.put(shelfID, this.shelfs.get(shelfID).getQuantity());
+      }
+
       // move every node to front
       for(Integer nodeID : this.nodes.keySet()) {
         nodes.get(nodeID).toFront();
       }
 
       // display a button for route closing
-      Button closeRouteButton = new Button("Close route");
+      Button closeRouteButton = new Button("Apply route restrictions");
       closeRouteButton.setPrefHeight(40);
-      closeRouteButton.setPrefWidth(100);
-      closeRouteButton.setLayoutX(this.warehouseWidth);
-      closeRouteButton.setLayoutY(300);
+      closeRouteButton.setPrefWidth(200);
+      closeRouteButton.setFont(Font.font ("Sans-serif", 13));
+      closeRouteButton.setLayoutX(this.warehouseWidth + 50);
+      closeRouteButton.setLayoutY(this.warehouseHeight - 70);
       closeRouteButton.setOnAction(actionEvent -> {
           closeBlackRoutes();
           openDarkredRoutes();
           pathFinder.setMatrix(nodes);
       });
       group.getChildren().add(closeRouteButton);
+
+      // separate GUI from scene
+      Line guiDelimiter = new Line(this.warehouseWidth, 0, this.warehouseWidth, this.warehouseHeight);
+      guiDelimiter.setStrokeWidth(2);
+      guiDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(guiDelimiter);
+
+      // timer
+      this.timer = new Text("00:00:00");
+      this.timer.setX(this.warehouseWidth + 60);
+      this.timer.setY(70);
+      this.timer.setFont(Font.font ("Sans-serif", 40));
+      group.getChildren().add(this.timer);
+
+      // separate Timer from the rest of GUI
+      Line timerDelimiter = new Line(this.warehouseWidth, 110, this.warehouseWidth+GUIWidth, 110);
+      timerDelimiter.setStrokeWidth(2);
+      timerDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(timerDelimiter);
+
+      // separate Timer from the rest of GUI
+      Line speedDelimiter = new Line(this.warehouseWidth, 170, this.warehouseWidth+GUIWidth, 170);
+      speedDelimiter.setStrokeWidth(2);
+      speedDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(speedDelimiter);
+
+      // display a button for simulation speed increase
+      Button speedPlusButton = new Button("+");
+      speedPlusButton.setPrefHeight(40);
+      speedPlusButton.setPrefWidth(40);
+      speedPlusButton.setFont(Font.font ("Sans-serif", 20));
+      speedPlusButton.setLayoutX(this.warehouseWidth + 30);
+      speedPlusButton.setLayoutY(120);
+      speedPlusButton.setOnAction(actionEvent -> {
+        if (updateSpeed/20 < 64)
+          updateSpeed *= 2;
+        speed.setText(String.format("%dx", updateSpeed/20));
+      });
+      group.getChildren().add(speedPlusButton);
+
+      // display a button for simulation speed decrease
+      Button speedMinusButton = new Button("-");
+      speedMinusButton.setPrefHeight(40);
+      speedMinusButton.setPrefWidth(40);
+      speedMinusButton.setFont(Font.font ("Sans-serif", 20));
+      speedMinusButton.setLayoutX(this.warehouseWidth + GUIWidth - 70);
+      speedMinusButton.setLayoutY(120);
+      speedMinusButton.setOnAction(actionEvent -> {
+        if (updateSpeed/20 > 1)
+          updateSpeed /= 2;
+        speed.setText(String.format("%dx", updateSpeed/20));
+      });
+      group.getChildren().add(speedMinusButton);
+
+      // speed info
+      this.speed = new Text("1x");
+      this.speed.setX(this.warehouseWidth + 135);
+      this.speed.setY(147);
+      this.speed.setFont(Font.font ("Sans-serif", 20));
+      this.speed.setTextAlignment(TextAlignment.CENTER);
+      group.getChildren().add(this.speed);
+
+      // set time input
+      this.setTimeInput = new TextField ();
+      this.setTimeInput.setLayoutX(this.warehouseWidth + 25);
+      this.setTimeInput.setLayoutY(190);
+      this.setTimeInput.setPrefWidth(115);
+      this.setTimeInput.setPrefHeight(40);
+      this.setTimeInput.setPromptText("hh:mm:ss");
+      this.setTimeInput.setFont(Font.font ("Sans-serif", 18));
+      group.getChildren().add(this.setTimeInput);
+
+      // set time button
+      Button setTimeButton = new Button("Set time");
+      setTimeButton.setPrefHeight(40);
+      setTimeButton.setPrefWidth(115);
+      setTimeButton.setFont(Font.font ("Sans-serif", 13));
+      setTimeButton.setLayoutX(this.warehouseWidth + 160);
+      setTimeButton.setLayoutY(190);
+      setTimeButton.setOnAction(actionEvent -> {
+        Long s = Long.parseLong(setTimeInput.getText().split(":")[2]);
+        Long m = Long.parseLong(setTimeInput.getText().split(":")[1]);
+        Long h = Long.parseLong(setTimeInput.getText().split(":")[0]);
+        currentEpochTime = h*3600000 + m*60000 + s*1000;
+
+        //set all the shelves into initial state
+        for(Integer shelfID : this.shelfsInitialQuantity.keySet()) {
+          this.shelfs.get(shelfID).setQuantity(this.shelfsInitialQuantity.get(shelfID));
+        }
+
+        for (int i = 0; i < orders.size(); i++) {
+          orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs);
+        }
+      });
+      group.getChildren().add(setTimeButton);
 
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
