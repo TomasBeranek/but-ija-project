@@ -26,6 +26,9 @@ import javafx.scene.control.Button;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 import javafx.scene.control.TextField;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
@@ -60,11 +63,18 @@ public class WarehouseSimulation extends Application {
    private Group group = new Group();
    private Text timer;
    private Text speed;
+   private int cartCapacity = 500;
+   private boolean dontPrintSelected = false;
+   private ListView<String> cartList;
+
+   private int sideGUIWidth = 300;
+   private int sideGUIHeight = 750;
+   private int bottomGUIWidth = 900;
+   private int bottomGUIHeight = 70;
 
    private Long currentEpochTime = 0L; // in ms
    private Long updateSpeed = 20L; // in ms
    private PathFinder pathFinder;
-   private TextField setTimeInput;
 
 
    /** Loads files into JSON objects.
@@ -226,10 +236,10 @@ public class WarehouseSimulation extends Application {
 
              shelfRec.setFill(Color.RED);
              highLightedShelf = (ShelfRectangle)shelfRec;
-             highLightedShelfID.setText("Selected shelf's ID: " + shelfRec.shelfID +
+             highLightedShelfID.setText("ID: " + shelfRec.shelfID +
                                         "\nAssociated node's ID: " + shelfRec.nodeID +
-                                        "\nShelf's content: " + "\n " + shelfRec.getGoods() +
-                                        "\nGoods quantity: " + shelfRec.getQuantity());
+                                        "\nContent: \n" + shelfRec.getGoods() +
+                                        "\nQuantity: " + shelfRec.getQuantity());
           }
        };
 
@@ -238,10 +248,17 @@ public class WarehouseSimulation extends Application {
        shelfs.put(shelfRec.shelfID, shelfRec);
      }
 
+     //caption of highilighted shelf info
+     Text highLightedShelfCaption = new Text("Selected shelf:");
+     highLightedShelfCaption.setX(this.warehouseWidth + 25);
+     highLightedShelfCaption.setY(150);
+     highLightedShelfCaption.setFont(Font.font ("Sans-serif", 20));
+     group.getChildren().add(highLightedShelfCaption);
+
      // add a text which shows ID of the selected shelf
-     highLightedShelfID = new Text("");
-     highLightedShelfID.setX(this.warehouseWidth);
-     highLightedShelfID.setY(20);
+     highLightedShelfID = new Text("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
+     highLightedShelfID.setX(this.warehouseWidth + 25);
+     highLightedShelfID.setY(180);
      group.getChildren().add(highLightedShelfID);
    }
 
@@ -313,7 +330,7 @@ public class WarehouseSimulation extends Application {
                nodeCircle.setFill(Color.BLUE);
                nodeCircle.setRadius(7);
                highLightedNode = (NodeCircle)nodeCircle;
-               highLightedNodeID.setText("Selected node: " + nodeCircle.ID+ " neighbours: " + nodeCircle.getNeighbours());
+               highLightedNodeID.setText("ID: " + nodeCircle.ID + "\nNeighbours: " + nodeCircle.getNeighbours());
             }
          };
 
@@ -323,10 +340,17 @@ public class WarehouseSimulation extends Application {
        nodes.put(nodeCircle.ID, nodeCircle);
      }
 
+     //caption of highilighted node info
+     Text highLightedNodeCaption = new Text("Selected node:");
+     highLightedNodeCaption.setX(this.warehouseWidth + 25);
+     highLightedNodeCaption.setY(40);
+     highLightedNodeCaption.setFont(Font.font ("Sans-serif", 20));
+     group.getChildren().add(highLightedNodeCaption);
+
      // add a text which shows ID of the selected shelf
-     highLightedNodeID = new Text("");
-     highLightedNodeID.setX(150);
-     highLightedNodeID.setY(20);
+     highLightedNodeID = new Text("ID: -\nNeighbours: -");
+     highLightedNodeID.setX(this.warehouseWidth + 25);
+     highLightedNodeID.setY(70);
      group.getChildren().add(highLightedNodeID);
    }
 
@@ -522,11 +546,20 @@ public class WarehouseSimulation extends Application {
      // update cart cords
      //cycle through orders
      this.timer.setText(String.format("%02d:%02d:%02d", (this.currentEpochTime/3600000)%24, (this.currentEpochTime/60000)%60, (this.currentEpochTime/1000)%60));
+     if (highLightedNodeID != null && highLightedNode != null && !dontPrintSelected)
+       this.highLightedNodeID.setText("ID: " + this.highLightedNode.ID + "\nNeighbours: " + this.highLightedNode.getNeighbours());
+     if (highLightedShelfID != null && highLightedShelf != null && !dontPrintSelected) {
+       highLightedShelfID.setText("ID: " + highLightedShelf.shelfID +
+                                  "\nAssociated node's ID: " + highLightedShelf.nodeID +
+                                  "\nContent: \n" + highLightedShelf.getGoods() +
+                                  "\nQuantity: " + highLightedShelf.getQuantity());
+     }
 
      for (int i = 0; i < orders.size(); i++) {
        if (orders.get(i).isActive(this.currentEpochTime)){
          if (!orders.get(i).hasCart()){
-           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs);
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs, this.cartList, this.cartCapacity);
+           //orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
          }
 
          //draw the cart
@@ -534,6 +567,7 @@ public class WarehouseSimulation extends Application {
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
            orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs), nodes);
+           //orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
      }
@@ -598,11 +632,16 @@ public class WarehouseSimulation extends Application {
       List<Pair<Integer, Pair<String, Integer>>> goods = getAllGoods(data.get(1));
       this.orders = getAllOrders(data.get(2));
 
-      int GUIWidth = 300;
       this.warehouseWidth = (int)Math.round(warehouseCords.getValue().getX()) +
                             (int)Math.round(warehouseCords.getKey().getX());
       this.warehouseHeight = (int)Math.round(warehouseCords.getValue().getY()) +
                              (int)Math.round(warehouseCords.getKey().getY());
+
+      if (sideGUIHeight > this.warehouseHeight)
+        this.warehouseHeight = sideGUIHeight;
+
+      if (bottomGUIWidth > this.warehouseWidth)
+        this.warehouseWidth = bottomGUIWidth;
 
       // warehouse background
       displayWarehouse(group, warehouseCords);
@@ -632,52 +671,42 @@ public class WarehouseSimulation extends Application {
         nodes.get(nodeID).toFront();
       }
 
-      // display a button for route closing
-      Button closeRouteButton = new Button("Apply route restrictions");
-      closeRouteButton.setPrefHeight(40);
-      closeRouteButton.setPrefWidth(200);
-      closeRouteButton.setFont(Font.font ("Sans-serif", 13));
-      closeRouteButton.setLayoutX(this.warehouseWidth + 50);
-      closeRouteButton.setLayoutY(this.warehouseHeight - 70);
-      closeRouteButton.setOnAction(actionEvent -> {
-          closeBlackRoutes();
-          openDarkredRoutes();
-          pathFinder.setMatrix(nodes);
-      });
-      group.getChildren().add(closeRouteButton);
+      //display bottom GUI
+      Rectangle bottomGUI = new Rectangle(0, this.warehouseHeight, this.warehouseWidth, bottomGUIHeight);
+      bottomGUI.setFill(Color.WHITE);
+      bottomGUI.setStrokeWidth(2);
+      bottomGUI.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(bottomGUI);
+      bottomGUI.toBack();
 
-      // separate GUI from scene
-      Line guiDelimiter = new Line(this.warehouseWidth, 0, this.warehouseWidth, this.warehouseHeight);
-      guiDelimiter.setStrokeWidth(2);
-      guiDelimiter.setStroke(Color.LIGHTGREY);
-      group.getChildren().add(guiDelimiter);
+      //display side GUI
+      Rectangle sideGUI = new Rectangle(this.warehouseWidth, 0, sideGUIWidth, this.warehouseHeight + bottomGUIHeight);
+      sideGUI.setFill(Color.WHITE);
+      sideGUI.setStrokeWidth(2);
+      sideGUI.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(sideGUI);
+      sideGUI.toBack();
 
-      // timer
+      //display timer
       this.timer = new Text("00:00:00");
-      this.timer.setX(this.warehouseWidth + 60);
-      this.timer.setY(70);
-      this.timer.setFont(Font.font ("Sans-serif", 40));
+      this.timer.setX(30);
+      this.timer.setY(this.warehouseHeight + 45);
+      this.timer.setFont(Font.font ("Sans-serif", 30));
       group.getChildren().add(this.timer);
 
-      // separate Timer from the rest of GUI
-      Line timerDelimiter = new Line(this.warehouseWidth, 110, this.warehouseWidth+GUIWidth, 110);
+      // separate Timer from the rest of the GUI
+      Line timerDelimiter = new Line(190, this.warehouseHeight, 190, this.warehouseHeight + bottomGUIHeight);
       timerDelimiter.setStrokeWidth(2);
       timerDelimiter.setStroke(Color.LIGHTGREY);
       group.getChildren().add(timerDelimiter);
-
-      // separate Timer from the rest of GUI
-      Line speedDelimiter = new Line(this.warehouseWidth, 170, this.warehouseWidth+GUIWidth, 170);
-      speedDelimiter.setStrokeWidth(2);
-      speedDelimiter.setStroke(Color.LIGHTGREY);
-      group.getChildren().add(speedDelimiter);
 
       // display a button for simulation speed increase
       Button speedPlusButton = new Button("+");
       speedPlusButton.setPrefHeight(40);
       speedPlusButton.setPrefWidth(40);
       speedPlusButton.setFont(Font.font ("Sans-serif", 20));
-      speedPlusButton.setLayoutX(this.warehouseWidth + 30);
-      speedPlusButton.setLayoutY(120);
+      speedPlusButton.setLayoutX(190 + 15);
+      speedPlusButton.setLayoutY(this.warehouseHeight + 15);
       speedPlusButton.setOnAction(actionEvent -> {
         if (updateSpeed/20 < 64)
           updateSpeed *= 2;
@@ -690,8 +719,8 @@ public class WarehouseSimulation extends Application {
       speedMinusButton.setPrefHeight(40);
       speedMinusButton.setPrefWidth(40);
       speedMinusButton.setFont(Font.font ("Sans-serif", 20));
-      speedMinusButton.setLayoutX(this.warehouseWidth + GUIWidth - 70);
-      speedMinusButton.setLayoutY(120);
+      speedMinusButton.setLayoutX(190 + 150);
+      speedMinusButton.setLayoutY(this.warehouseHeight + 15);
       speedMinusButton.setOnAction(actionEvent -> {
         if (updateSpeed/20 > 1)
           updateSpeed /= 2;
@@ -701,51 +730,131 @@ public class WarehouseSimulation extends Application {
 
       // speed info
       this.speed = new Text("1x");
-      this.speed.setX(this.warehouseWidth + 135);
-      this.speed.setY(147);
+      this.speed.setX(280);
+      this.speed.setY(this.warehouseHeight + 42);
       this.speed.setFont(Font.font ("Sans-serif", 20));
       this.speed.setTextAlignment(TextAlignment.CENTER);
       group.getChildren().add(this.speed);
 
-      // set time input
-      this.setTimeInput = new TextField ();
-      this.setTimeInput.setLayoutX(this.warehouseWidth + 25);
-      this.setTimeInput.setLayoutY(190);
-      this.setTimeInput.setPrefWidth(115);
-      this.setTimeInput.setPrefHeight(40);
-      this.setTimeInput.setPromptText("hh:mm:ss");
-      this.setTimeInput.setFont(Font.font ("Sans-serif", 18));
-      group.getChildren().add(this.setTimeInput);
+      // separate speed controls from the rest of the GUI
+      Line speedDelimiter = new Line(395, this.warehouseHeight, 395, this.warehouseHeight + bottomGUIHeight);
+      speedDelimiter.setStrokeWidth(2);
+      speedDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(speedDelimiter);
+
+      // separate reset timer from the rest of the GUI
+      Line resetDelimiter = new Line(540, this.warehouseHeight, 540, this.warehouseHeight + bottomGUIHeight);
+      resetDelimiter.setStrokeWidth(2);
+      resetDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(resetDelimiter);
+
+      // display a button for route closing
+      Button closeRouteButton = new Button("Apply route restrictions");
+      closeRouteButton.setPrefHeight(40);
+      closeRouteButton.setPrefWidth(200);
+      closeRouteButton.setFont(Font.font ("Sans-serif", 13));
+      closeRouteButton.setLayoutX(this.warehouseWidth - 15 - 200);
+      closeRouteButton.setLayoutY(this.warehouseHeight + 15);
+      closeRouteButton.setOnAction(actionEvent -> {
+          closeBlackRoutes();
+          openDarkredRoutes();
+          pathFinder.setMatrix(nodes);
+      });
+      group.getChildren().add(closeRouteButton);
+
+      // separate route restrictions from the rest of the GUI
+      Line restrictionsDelimiter = new Line(this.warehouseWidth - 30 - 200, this.warehouseHeight, this.warehouseWidth - 30 - 200, this.warehouseHeight + bottomGUIHeight);
+      restrictionsDelimiter.setStrokeWidth(2);
+      restrictionsDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(restrictionsDelimiter);
+
+      // separate node info from the rest of the GUI
+      Line nodeInfoDelimiter = new Line(this.warehouseWidth, 110, this.warehouseWidth + this.sideGUIWidth, 110);
+      nodeInfoDelimiter.setStrokeWidth(2);
+      nodeInfoDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(nodeInfoDelimiter);
+
+      // separate shelf info from the rest of the GUI
+      Line shelfInfoDelimiter = new Line(this.warehouseWidth, 265, this.warehouseWidth + this.sideGUIWidth, 265);
+      shelfInfoDelimiter.setStrokeWidth(2);
+      shelfInfoDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(shelfInfoDelimiter);
+
+      //caption of highilighted cart info
+      Text highLightedCartCaption = new Text("Goods on a cart:");
+      highLightedCartCaption.setX(this.warehouseWidth + 25);
+      highLightedCartCaption.setY(305);
+      highLightedCartCaption.setFont(Font.font ("Sans-serif", 20));
+      group.getChildren().add(highLightedCartCaption);
+
+      // a list of loaded goods on a cart
+      this.cartList = new ListView<String>();
+      ObservableList<String> cartLitems = FXCollections.observableArrayList ("No cart selected");
+      cartList.setItems(cartLitems);
+      cartList.setPrefWidth(250);
+      cartList.setPrefHeight(80);
+      cartList.setLayoutX(this.warehouseWidth + 25);
+      cartList.setLayoutY(325);
+      group.getChildren().add(cartList);
 
       // set time button
-      Button setTimeButton = new Button("Set time");
+      Button setTimeButton = new Button("Reset time");
       setTimeButton.setPrefHeight(40);
       setTimeButton.setPrefWidth(115);
       setTimeButton.setFont(Font.font ("Sans-serif", 13));
-      setTimeButton.setLayoutX(this.warehouseWidth + 160);
-      setTimeButton.setLayoutY(190);
+      setTimeButton.setLayoutX(395 + 15);
+      setTimeButton.setLayoutY(this.warehouseHeight + 15);
       setTimeButton.setOnAction(actionEvent -> {
-        Long s = Long.parseLong(setTimeInput.getText().split(":")[2]);
-        Long m = Long.parseLong(setTimeInput.getText().split(":")[1]);
-        Long h = Long.parseLong(setTimeInput.getText().split(":")[0]);
-        currentEpochTime = h*3600000 + m*60000 + s*1000;
-
-        //set all the shelves into initial state
-        for(Integer shelfID : this.shelfsInitialQuantity.keySet()) {
-          this.shelfs.get(shelfID).setQuantity(this.shelfsInitialQuantity.get(shelfID));
-        }
+        currentEpochTime = 0L;
 
         for (int i = 0; i < orders.size(); i++) {
-          orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs);
+          orders.get(i).cart.setRadius(0);
+          group.getChildren().remove(orders.get(i).cart);
         }
+
+        dontPrintSelected = true;
+        if (highLightedNodeID != null && highLightedNode != null){
+          this.highLightedNodeID.setText("ID: -\nNeighbours: -");
+        }
+
+        for(Integer nodeID : nodes.keySet()){
+          nodes.get(nodeID).setFill(Color.RED);
+          nodes.get(nodeID).setRadius(5);
+        }
+
+        group.getChildren().remove(highLightedShelfID);
+        highLightedShelf = null;
+
+        this.cartList.setItems(FXCollections.observableArrayList ("No cart selected"));
+
+        this.orders = new ArrayList<>();
+        this.shelfs = new Hashtable<>();
+        this.orders = getAllOrders(data.get(2));
+        displayShelfs(group, shelfsCords);
+        loadGoodsToShelfs(goods);
+
+        //reset pathFinder
+        this.pathFinder = new PathFinder(this.nodes, this.shelfs);
+        //this.pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
+
+        //reset all carts
+        for (int i = 0; i < orders.size(); i++) {
+          orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs, this.cartList, this.cartCapacity);
+          //orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
+        }
+
+        dontPrintSelected = false;
       });
       group.getChildren().add(setTimeButton);
 
       //Creating a Scene by passing the group object, height and width
-      Scene scene = new Scene(group ,this.warehouseWidth + GUIWidth, this.warehouseHeight);
+      Scene scene = new Scene(group ,this.warehouseWidth + sideGUIWidth, this.warehouseHeight + bottomGUIHeight);
 
       //Setting the title to Stage
       primaryStage.setTitle("Warehouse Simulation");
+
+      //disable resizing
+      primaryStage.setResizable(false);
 
       //Adding the scene to Stage
       primaryStage.setScene(scene);
@@ -754,8 +863,8 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
 
       //initialize PathFinder -- creates a matrix of distances
-      //pathFinder = new PathFinder(nodes);
-      pathFinder = new PathFinder(nodes, shelfs);
+      this.pathFinder = new PathFinder(this.nodes, this.shelfs);
+      //pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
 
       //run the simulation
       //ugly,ugly nesting

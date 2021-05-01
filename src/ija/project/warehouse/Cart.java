@@ -8,6 +8,9 @@ import javafx.animation.TranslateTransition;
 import javafx.scene.*;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
 
 
 /** Represents a cart which picks up the goods. The class is inherited from
@@ -17,7 +20,8 @@ import javafx.scene.input.MouseEvent;
  */
 public class Cart extends Circle {
   private Long lastEpochTime = 0L;
-  private int capacity = 500;
+  private int capacity;
+  public int currCapacity = 0;
   public List<Pair<Integer, Pair<String, Integer>>> path = null;
   private Long waitUntilTime = -1L;
   private int pathLen = 0;
@@ -31,19 +35,22 @@ public class Cart extends Circle {
   private Hashtable<Integer, NodeCircle> nodes;
   private boolean cartIsActive = false;
   private Long startEpochTime = 0L;
-
+  private ListView<String> cartList = null;
+  private ArrayList<Pair<String, Integer>> pickedUpGoods = new ArrayList<>();
 
   /**
    * @param x The cart's x coordinate.
    * @param y The cart's y coordinate.
    * @param r The cart's radius for a visualization.
    */
-  public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves, Long startEpochTime){
+  public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves, Long startEpochTime, ListView<String> cartList, int capacity){
     super(x, y, r);
     //this.setCache(true);
     //this.setCacheHint(CacheHint.SPEED);
     this.shelves = shelves;
     this.startEpochTime = startEpochTime;
+    this.cartList = cartList;
+    this.capacity = capacity;
   }
 
 
@@ -79,7 +86,6 @@ public class Cart extends Circle {
     this.path = path;
     this.pathLen = getPathLen(nodes);
     this.nodes = nodes;
-
     this.lastVisitedNodeIndex = 0;
     this.traveledLen = 0;
 
@@ -97,6 +103,15 @@ public class Cart extends Circle {
               thisCopy.nodes.get(nodeID).setRadius(5);
             }
           }
+
+          ObservableList<String> cartLitems = FXCollections.observableArrayList();
+
+          for(int i = 0; i < pickedUpGoods.size(); i++){
+            cartLitems.add(pickedUpGoods.get(i).getValue() + "x\t " + pickedUpGoods.get(i).getKey());
+          }
+
+          cartList.setItems(cartLitems);
+
 
           // highlight the current path
           for (int i = 0; i < thisCopy.path.size(); i++) {
@@ -123,6 +138,11 @@ public class Cart extends Circle {
       this.lastEpochTime = currentEpochTime; //this the first update called
       this.traveledLen = (int)(((currentEpochTime - this.startEpochTime)/1000.0)*this.speed);
     }
+
+    //if there is not defined path, stay on the spot and ask for recalcucation
+    if (this.path == null)
+      return "Stopped";
+
     int nodeID = this.path.get(0).getKey();
 
     this.setRadius(10); //make sure it is visible
@@ -201,19 +221,27 @@ public class Cart extends Circle {
           String goodsName = this.path.get(lastVisitedNodeIndex).getValue().getKey();
           int lastNodeID = this.path.get(lastVisitedNodeIndex).getKey();
 
-          //find shelf by nodeID and goods name and pick up goods
-          for(Integer shelfID : this.shelves.keySet()) {
-            if (this.shelves.get(shelfID).getGoods().equals(goodsName)
-                && this.shelves.get(shelfID).getNode() == lastNodeID){
-                  //pick the goods form the shelf
-                  this.shelves.get(shelfID).decreaseQuantity(quantity);
+          //dispense all the goods
+          if (goodsName.equals("dispense")){
+            this.pickedUpGoods.clear();
+            this.currCapacity = 0;
+          } else {
+            //find shelf by nodeID and goods name and pick up goods
+            for(Integer shelfID : this.shelves.keySet()) {
+              if (this.shelves.get(shelfID).getGoods().equals(goodsName)
+                  && this.shelves.get(shelfID).getNode() == lastNodeID){
+                    //pick the goods form the shelf
+                    this.pickedUpGoods.add(new Pair<>(goodsName, quantity));
+                    this.currCapacity += quantity;
+                    this.shelves.get(shelfID).decreaseQuantity(quantity);
 
-                  //save previous color
-                  this.shelves.get(shelfID).toFront();
-                  this.shelves.get(shelfID).setStrokeWidth(6);
-                  this.shelves.get(shelfID).setStroke(Color.GREY);
-                  this.highlightedShelfID = shelfID;
-                }
+                    //save previous color
+                    this.shelves.get(shelfID).toFront();
+                    this.shelves.get(shelfID).setStrokeWidth(6);
+                    this.shelves.get(shelfID).setStroke(Color.GREY);
+                    this.highlightedShelfID = shelfID;
+                  }
+            }
           }
         }
 

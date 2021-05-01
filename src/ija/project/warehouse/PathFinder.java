@@ -234,7 +234,7 @@ public class PathFinder {
   public List<Pair<Integer, Pair<String, Integer>>> refindPath(List<Pair<Integer, Pair<String, Integer>>> path,
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs){
-        
+
     int actualNode = path.get(0).getKey();
     List<Pair<String, Integer>> newOrder = new ArrayList<>(); //new order list
     boolean newItem = true;

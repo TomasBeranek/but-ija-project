@@ -4,6 +4,10 @@ import ija.project.warehouse.Cart;
 import java.util.*;
 import javafx.util.*;
 import javafx.scene.Group;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
+
 
 /** Represents an order which consists of unlimited amount of pairs:
  *  name-quantity. The same type of goods can be specified multiple times.
@@ -61,15 +65,18 @@ public class Order {
    * @param path The sequence of nodes (path).
    * @param nodes The list of all the nodes.
    */
-  public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelves) {
+  public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelves, ListView<String> cartList, int capacity) {
     int startX = nodes.get(path.get(0).getKey()).getX();
     int startY = nodes.get(path.get(0).getKey()).getY();
 
     //remove the old cart if there was any
-    if (this.cart != null)
+    if (this.cart != null){
+      //make the cart invisible
+      this.cart.setRadius(0);
       group.getChildren().remove(this.cart);
+    }
 
-    this.cart = new Cart(startX, startY, 0, shelves, startEpochTime);
+    this.cart = new Cart(startX, startY, 0, shelves, startEpochTime, cartList, capacity);
     group.getChildren().add(this.cart);
     this.cart.addPath(path, nodes);
   }
