@@ -18,13 +18,18 @@ import java.util.HashSet;
 public class PathFinder {
   private int[][] distance; //matrix with distances between nodes
   private int[][] next; //matrix with best way between nodes
-  private Hashtable<Integer, Integer> localShelfs = new Hashtable<>(); //rezervationed goods in shelfs
+  private Hashtable<Integer, Integer> localShelfs; //rezervationed goods in shelfs
+  private int max_quantity;
 
   /**
-   * @param nodes Hashrable of nodes ID and NodeCircle
+   * @param nodes Hashtable of nodes ID and NodeCircle
+   * @param shelfs
+   * @param max_number
    */
-  public PathFinder(Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelfs) {
+  public PathFinder(Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelfs, Integer max_number) {
     int number_nodes = nodes.size();
+    this.max_quantity = max_number;
+    this.localShelfs = new Hashtable<>();
     // creates a distance of nodes distances
     this.distance = new int[number_nodes][number_nodes];
     this.next = new int[number_nodes][number_nodes];
@@ -38,9 +43,6 @@ public class PathFinder {
     shelfs.forEach((k, v) -> {
       this.localShelfs.put(k,0);
     });
-    /*this.localShelfs.forEach((k, v) -> {
-      System.out.print("localShelf: " + k + " with value: " + v + "\n");
-    });*/
   }
 
   /** Set default matrix for Floyd-Warhall processing
@@ -143,14 +145,17 @@ public class PathFinder {
    *  @param actualNode The node number where the cart is currently located
    *  @return Number of nodes with required goods and good name and quantity in sub-optimal order
    */
-  private List<Pair<Integer,Pair<String, Integer>>> orderProcessing(List<Pair<String, Integer>> order,
-                              Hashtable<Integer, ShelfRectangle> shelfs, int actualNode) {
-
-    Hashtable<Integer,Integer> requiredNodes = new Hashtable<Integer, Integer>();
+  private List<Pair<Integer,Pair<String, Integer>>> orderProcessing(List<Pair<String, Integer>> o_order,
+                              Hashtable<Integer, ShelfRectangle> shelfs, int actualNode, int goods_in_cart) {
+    List<Pair<String, Integer>> order = new ArrayList<Pair<String,Integer>>();
+    for(int i = 0; i < o_order.size(); i++){
+      order.add(i, new Pair<String, Integer>(o_order.get(i).getKey(),o_order.get(i).getValue()));
+    }
+    int cart_num = goods_in_cart;
+    Hashtable<Integer,Integer> requiredNodes = new Hashtable<Integer, Integer>(); //nodeID,shelfID
     Set<Integer> Keys = shelfs.keySet();
     for(int i: Keys){
       for(int j = 0; j < order.size(); j++){
-
         if(shelfs.get(i).getGoods().equals(order.get(j).getKey())){
           requiredNodes.put(shelfs.get(i).nodeID,i);
           break;
@@ -158,28 +163,74 @@ public class PathFinder {
       }
     }
 
+    Pair<String, Integer> doNotPickUp = new Pair<>("dispense", 0);
+
     List<Pair<Integer,Pair<String, Integer>>> path = new ArrayList<Pair<Integer,Pair<String, Integer>>>();
     Pair<String, Integer> pickUp;
     int nearest = -1;
     String goodName = "";
     while(requiredNodes.size() != 0){
       nearest = nearestNode(requiredNodes, actualNode);
+      if(nearest == -1)
+        break;
       goodName = shelfs.get(requiredNodes.get(nearest)).getGoods();
       for(int j = 0; j < order.size(); j++){  //for each order
         if(order.get(j).getValue() == 0)  //the order has already been processed
           continue;
         if(order.get(j).getKey().equals(goodName)){ //shelf has required good
-          if(order.get(j).getValue() <= (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)))){  //shelf has enought goods
-            pickUp = new Pair<String, Integer>(order.get(j).getKey(), order.get(j).getValue());
-            path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
-            this.localShelfs.put(requiredNodes.get(nearest), this.localShelfs.get(requiredNodes.get(nearest)) + order.get(j).getValue()); //add number of items in order
-            order.set(j, new Pair<String, Integer>(goodName,0));
-          }
-          else if(shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)) != 0){ //shelf hasn't enought goods
-              pickUp = new Pair<String, Integer>(order.get(j).getKey(), shelfs.get(requiredNodes.get(nearest)).getQuantity());
-              this.localShelfs.put(requiredNodes.get(nearest), this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))));  //add number of items in shelf
-              path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
-              order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
+          if(order.get(j).getValue() != 0){
+            if(order.get(j).getValue() <= (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)))){  //shelf has enought goods
+              if((this.max_quantity - goods_in_cart) >= order.get(j).getValue()){ //in cart is enough space
+                goods_in_cart = goods_in_cart + order.get(j).getValue();
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), order.get(j).getValue());
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                int value = this.localShelfs.get(requiredNodes.get(nearest)) + order.get(j).getValue();
+                this.localShelfs.put(requiredNodes.get(nearest), value); //add number of items in order
+                //System.out.print("node: " + requiredNodes.get(nearest) + " reserve: " + value + "\n");
+                order.set(j, new Pair<String, Integer>(goodName,0));
+              }
+              else{ //in cart is not enough space
+                int first_loading = this.max_quantity - goods_in_cart;
+                int second_loading = (order.get(j).getValue() - (this.max_quantity - goods_in_cart));
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), first_loading);
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                path.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp));
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), second_loading);
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                goods_in_cart = second_loading;
+                int value = this.localShelfs.get(requiredNodes.get(nearest)) + order.get(j).getValue();
+                this.localShelfs.put(requiredNodes.get(nearest), value);
+                order.set(j, new Pair<String, Integer>(goodName,0));
+              }
+            }
+            else if((shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))) > 0){ //shelf hasn't enought goods
+              if((this.max_quantity - goods_in_cart) >= (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)))){
+                goods_in_cart = goods_in_cart + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))));
+                int value = this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
+                this.localShelfs.put(requiredNodes.get(nearest), value);  //add number of items in shelf
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
+                //System.out.print("node: " + requiredNodes.get(nearest) + " reserve: " + value + "\n");
+              }
+              else{
+                int first_loading = this.max_quantity - goods_in_cart;
+                int second_loading = ((shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))) - (this.max_quantity - goods_in_cart));
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), first_loading);
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                path.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp));
+                pickUp = new Pair<String, Integer>(order.get(j).getKey(), second_loading);
+                path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
+                goods_in_cart = second_loading;
+                int value = this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
+                this.localShelfs.put(requiredNodes.get(nearest), value);
+                order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
+              }
+            }
+            if(goods_in_cart == this.max_quantity){
+              path.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp));
+              goods_in_cart = 0;
+            }
           }
         }
       }
@@ -233,9 +284,17 @@ public class PathFinder {
    */
   public List<Pair<Integer, Pair<String, Integer>>> refindPath(List<Pair<Integer, Pair<String, Integer>>> path,
           List<Pair<String, Integer>> order,
-          Hashtable<Integer, ShelfRectangle> shelfs){
-        
+          Hashtable<Integer, ShelfRectangle> shelfs,
+          int goods_in_cart){
+    for(int i = 0; i < order.size(); i++){
+      System.out.print("Order ID: " + i + " with good name: " + order.get(i).getKey() + " number: " + order.get(i).getValue() + " \n");
+    }
     int actualNode = path.get(0).getKey();
+    if(distance[actualNode][0] == Integer.MAX_VALUE){
+      System.out.print("Cannot get to starting node!\n");
+      return null;
+    }
+      
     List<Pair<String, Integer>> newOrder = new ArrayList<>(); //new order list
     boolean newItem = true;
 
@@ -252,19 +311,46 @@ public class PathFinder {
           }
         }
         if(newItem){  //it is new item
+          System.out.print("refindPath: newOrderList " + path.get(i).getValue().getKey() + "\n");
           newOrder.add(new Pair<String, Integer>(path.get(i).getValue().getKey(), path.get(i).getValue().getValue()));  //add it to newOrder list
         }
 
+        Integer value = 0;
         //unreservate items in localShelfs
         Set<Integer> keys = shelfs.keySet();
         for(Integer key: keys){
-          if((shelfs.get(key).nodeID == path.get(i).getKey()) && (shelfs.get(key).getGoods().equals(path.get(i).getValue().getValue())))  //node of shelf and name of item is same
-            this.localShelfs.put(key,this.localShelfs.get(key) - path.get(i).getValue().getValue());  //reduce number of reservated items in actual shelf
+          if((shelfs.get(key).nodeID == path.get(i).getKey()) && (shelfs.get(key).getGoods().equals(path.get(i).getValue().getKey()))){  //node of shelf and name of item is same
+            
+            value = (this.localShelfs.get(key) - path.get(i).getValue().getValue());
+            System.out.print("Unreservate goods in shelf: " + key + " new reservate goods number: " + value + "\n");
+            this.localShelfs.put(key,value);  //reduce number of reservated items in actual shelf
+          }
         }
       }
     }
+    for(int i = 0; i < newOrder.size(); i++){
+      System.out.print("newOrder ID: " + i + " with good name: " + newOrder.get(i).getKey() + " number: " + newOrder.get(i).getValue() + " \n");
+    }
+    /*int goods_in_cart = 0;
+    for(int j = 0; j < order.size(); j++){  //for each item in order
+      for(int i = 0; i < newOrder.size(); i++){
+        if(order.get(j).getKey().equals(newOrder.get(i).getKey())){
+          if(order.get(j).getValue() == newOrder.get(i).getValue()){
+            goods_in_cart = goods_in_cart + order.get(j).getValue();
+            System.out.print("This order is not completed, with good name: " + order.get(j).getKey() + "\n");
+          }
+          else if(){
+            goods_in_cart = goods_in_cart + (order.get(j).getValue() - newOrder.get(i).getValue());
+          }
+        }
+        if(goods_in_cart >= 500){
+          goods_in_cart = goods_in_cart - 500;
+        }
+      }
+    }*/
 
-    return findPath(newOrder, shelfs, actualNode);  //return new path
+    System.out.print("refindPath: find new path; actual node: " + actualNode + " actual goods_in_cart: " + goods_in_cart + "\n");
+    return findPath(newOrder, shelfs, actualNode, goods_in_cart);  //return new path
   }
 
   /** Finding complet the shortest path for a given order with data about collection of goods
@@ -278,23 +364,32 @@ public class PathFinder {
   public List<Pair<Integer, Pair<String, Integer>>> findPath(
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs,
-          int actualNode){
+          int actualNode, int goods_in_cart){
     Pair<String, Integer> doNotPickUp = new Pair<>("", 0);
-    List<Pair<Integer,Pair<String, Integer>>> nodes = orderProcessing(order,shelfs, actualNode);  //wanted nodes with goods
+    List<Pair<Integer,Pair<String, Integer>>> nodes = orderProcessing(order,shelfs, actualNode, goods_in_cart);  //wanted nodes with goods
     List<Pair<Integer,Pair<String, Integer>>> nodePath = new ArrayList<>(); //path
 
-    //add path from actual node to first wanted node
-    nodePath.add(new Pair<Integer, Pair<String, Integer>>(actualNode, doNotPickUp));
-    nodePath.addAll(constructPath(actualNode,nodes.get(0).getKey()));
-    nodePath.add(nodes.get(0));
-
-    for(int i = 0; i < (nodes.size()-1);i++){
-      nodePath.addAll(constructPath(nodes.get(i).getKey(),nodes.get(i+1).getKey()));
-      nodePath.add(nodes.get(i+1));
+    if(nodes.isEmpty()){
+      System.out.print("Nodes is empty!");
+      nodePath.add(new Pair<Integer, Pair<String, Integer>>(actualNode, doNotPickUp));
+      nodePath.addAll(constructPath(actualNode,0));
+      nodePath.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp)); //add starting node
     }
+    else{
+      //add path from actual node to first wanted node
+      nodePath.add(new Pair<Integer, Pair<String, Integer>>(actualNode, doNotPickUp));
+      nodePath.addAll(constructPath(actualNode,nodes.get(0).getKey()));
+      System.out.print("\tFirst node: " + nodes.get(0).getKey() + "\n");
+      nodePath.add(nodes.get(0));
 
-    nodePath.addAll(constructPath(nodes.get(nodes.size() - 1).getKey(),0)); //add path between last wanted node and starting point(default 0)
-    nodePath.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp)); //add starting node
+      for(int i = 0; i < (nodes.size()-1);i++){
+        nodePath.addAll(constructPath(nodes.get(i).getKey(),nodes.get(i+1).getKey()));
+        nodePath.add(nodes.get(i+1));
+      }
+
+      nodePath.addAll(constructPath(nodes.get(nodes.size() - 1).getKey(),0)); //add path between last wanted node and starting point(default 0)
+      nodePath.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp)); //add starting node
+    }
 
     return nodePath;
   }
