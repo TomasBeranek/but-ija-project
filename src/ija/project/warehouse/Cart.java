@@ -37,6 +37,8 @@ public class Cart extends Circle {
   private Long startEpochTime = 0L;
   private ListView<String> cartList = null;
   private ArrayList<Pair<String, Integer>> pickedUpGoods = new ArrayList<>();
+  private int lastVisitedNodeID;
+  private boolean newPathRecentlyAdded = true;
 
   /**
    * @param x The cart's x coordinate.
@@ -55,7 +57,14 @@ public class Cart extends Circle {
 
 
   public List<Pair<Integer, Pair<String, Integer>>> getRemainingPath(){
-    return this.path.subList(lastVisitedNodeIndex, this.path.size());
+    if (this.path == null){
+      Pair<String, Integer> goods = new Pair<>("", 0);
+      ArrayList<Pair<Integer, Pair<String, Integer>>> arr = new ArrayList<Pair<Integer, Pair<String, Integer>>>();
+      arr.add(new Pair<>(this.lastVisitedNodeID, goods));
+      return arr;
+    }
+    else
+      return this.path.subList(lastVisitedNodeIndex, this.path.size());
   }
 
 
@@ -88,6 +97,7 @@ public class Cart extends Circle {
     this.nodes = nodes;
     this.lastVisitedNodeIndex = 0;
     this.traveledLen = 0;
+    this.newPathRecentlyAdded = true;
 
     // handler cannot reach 'this' variable
     Cart thisCopy = this;
@@ -139,6 +149,18 @@ public class Cart extends Circle {
       this.traveledLen = (int)(((currentEpochTime - this.startEpochTime)/1000.0)*this.speed);
     }
 
+    if (this.newPathRecentlyAdded){
+      this.lastEpochTime = currentEpochTime;
+      this.traveledLen = 0;
+      this.newPathRecentlyAdded = false;
+
+      // check if path finder returned path from 0 to 0, if so end it
+      if (this.path.size() == 2 && this.path.get(0).getKey() == 0 && this.path.get(0).getKey() == 0){
+        return "Finished";
+      }
+    }
+
+
     //if there is not defined path, stay on the spot and ask for recalcucation
     if (this.path == null)
       return "Stopped";
@@ -157,6 +179,7 @@ public class Cart extends Circle {
     Long duration = currentEpochTime - this.lastEpochTime;
     int distanceToTravel = (int)((duration/1000.0)*this.speed);
     this.lastEpochTime = currentEpochTime;
+    this.lastVisitedNodeID = lastNode.ID;
 
     // 3 things can happen:
     //  1) the next position will be still between the same two points

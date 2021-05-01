@@ -207,11 +207,10 @@ public class PathFinder {
               if((this.max_quantity - goods_in_cart) >= (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)))){
                 goods_in_cart = goods_in_cart + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
                 pickUp = new Pair<String, Integer>(order.get(j).getKey(), (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))));
-                int value = this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
-                this.localShelfs.put(requiredNodes.get(nearest), value);  //add number of items in shelf
                 path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
                 order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
-                //System.out.print("node: " + requiredNodes.get(nearest) + " reserve: " + value + "\n");
+                int value = this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
+                this.localShelfs.put(requiredNodes.get(nearest), value);  //add number of items in shelf
               }
               else{
                 int first_loading = this.max_quantity - goods_in_cart;
@@ -222,9 +221,9 @@ public class PathFinder {
                 pickUp = new Pair<String, Integer>(order.get(j).getKey(), second_loading);
                 path.add(new Pair<Integer, Pair<String, Integer>>(nearest, pickUp));
                 goods_in_cart = second_loading;
+                order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
                 int value = this.localShelfs.get(requiredNodes.get(nearest)) + (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest)));
                 this.localShelfs.put(requiredNodes.get(nearest), value);
-                order.set(j, new Pair<String, Integer>(goodName,(order.get(j).getValue() - (shelfs.get(requiredNodes.get(nearest)).getQuantity() - this.localShelfs.get(requiredNodes.get(nearest))))));
               }
             }
             if(goods_in_cart == this.max_quantity){
