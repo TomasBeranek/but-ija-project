@@ -558,16 +558,14 @@ public class WarehouseSimulation extends Application {
      for (int i = 0; i < orders.size(); i++) {
        if (orders.get(i).isActive(this.currentEpochTime)){
          if (!orders.get(i).hasCart()){
-           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs, this.cartList, this.cartCapacity);
-           //orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
+           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
          }
 
          //draw the cart
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
-           orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs), nodes);
-           //orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
+           orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
      }
@@ -834,13 +832,11 @@ public class WarehouseSimulation extends Application {
         loadGoodsToShelfs(goods);
 
         //reset pathFinder
-        this.pathFinder = new PathFinder(this.nodes, this.shelfs);
-        //this.pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
+        this.pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
 
         //reset all carts
         for (int i = 0; i < orders.size(); i++) {
-          orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0), nodes, shelfs, this.cartList, this.cartCapacity);
-          //orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
+          orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
         }
 
         dontPrintSelected = false;
@@ -863,8 +859,7 @@ public class WarehouseSimulation extends Application {
       primaryStage.show();
 
       //initialize PathFinder -- creates a matrix of distances
-      this.pathFinder = new PathFinder(this.nodes, this.shelfs);
-      //pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
+      pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
 
       //run the simulation
       //ugly,ugly nesting
