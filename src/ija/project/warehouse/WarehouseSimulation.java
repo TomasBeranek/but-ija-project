@@ -790,10 +790,23 @@ public class WarehouseSimulation extends Application {
       ObservableList<String> cartLitems = FXCollections.observableArrayList ("No cart selected");
       cartList.setItems(cartLitems);
       cartList.setPrefWidth(250);
-      cartList.setPrefHeight(80);
+      cartList.setPrefHeight(150);
       cartList.setLayoutX(this.warehouseWidth + 25);
       cartList.setLayoutY(325);
       group.getChildren().add(cartList);
+
+      // separate a list of goods on a cart from the rest of the GUI
+      Line cartInfoDelimiter = new Line(this.warehouseWidth, 505, this.warehouseWidth + this.sideGUIWidth, 505);
+      cartInfoDelimiter.setStrokeWidth(2);
+      cartInfoDelimiter.setStroke(Color.LIGHTGREY);
+      group.getChildren().add(cartInfoDelimiter);
+
+      //caption of "add an order"
+      Text orderCaption = new Text("Add an order:");
+      orderCaption.setX(this.warehouseWidth + 25);
+      orderCaption.setY(545);
+      orderCaption.setFont(Font.font ("Sans-serif", 20));
+      group.getChildren().add(orderCaption);
 
       // set time button
       Button setTimeButton = new Button("Reset time");
@@ -811,9 +824,11 @@ public class WarehouseSimulation extends Application {
         }
 
         dontPrintSelected = true;
-        if (highLightedNodeID != null && highLightedNode != null){
+        if (this.highLightedNodeID != null){
           this.highLightedNodeID.setText("ID: -\nNeighbours: -");
         }
+
+        highLightedNode = null;
 
         for(Integer nodeID : nodes.keySet()){
           nodes.get(nodeID).setFill(Color.RED);

@@ -23,6 +23,7 @@ public class Cart extends Circle {
   private int capacity;
   public int currCapacity = 0;
   public List<Pair<Integer, Pair<String, Integer>>> path = null;
+  public List<Pair<Integer, Pair<String, Integer>>> pathCopy = null;
   private Long waitUntilTime = -1L;
   private int pathLen = 0;
   private int traveledLen = 0;
@@ -31,7 +32,7 @@ public class Cart extends Circle {
   private int pickUpTime = 4000; //ms
   private Hashtable<Integer, ShelfRectangle> shelves;
   private int highlightedShelfID = -1;
-  private int lastVisitedNodeIndex = -1;
+  private int lastVisitedNodeIndex = 0;
   private Hashtable<Integer, NodeCircle> nodes;
   private boolean cartIsActive = false;
   private Long startEpochTime = 0L;
@@ -58,10 +59,11 @@ public class Cart extends Circle {
 
   public List<Pair<Integer, Pair<String, Integer>>> getRemainingPath(){
     if (this.path == null){
-      Pair<String, Integer> goods = new Pair<>("", 0);
-      ArrayList<Pair<Integer, Pair<String, Integer>>> arr = new ArrayList<Pair<Integer, Pair<String, Integer>>>();
-      arr.add(new Pair<>(this.lastVisitedNodeID, goods));
-      return arr;
+      return this.pathCopy.subList(lastVisitedNodeIndex, this.pathCopy.size());
+      //Pair<String, Integer> goods = new Pair<>("", 0);
+      //ArrayList<Pair<Integer, Pair<String, Integer>>> arr = new ArrayList<Pair<Integer, Pair<String, Integer>>>();
+      //arr.add(new Pair<>(this.lastVisitedNodeID, goods));
+      //return arr;
     }
     else
       return this.path.subList(lastVisitedNodeIndex, this.path.size());
@@ -92,6 +94,11 @@ public class Cart extends Circle {
    * @param nodes The list of all the nodes.
    */
   public void addPath(List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes) {
+    if (path == null && this.path != null){
+      this.pathCopy = this.path;
+      System.out.println(this.pathCopy);
+    }
+
     this.path = path;
     this.pathLen = getPathLen(nodes);
     this.nodes = nodes;
@@ -124,12 +131,14 @@ public class Cart extends Circle {
 
 
           // highlight the current path
-          for (int i = 0; i < thisCopy.path.size(); i++) {
-            int nodeID = thisCopy.path.get(i).getKey();
+          if (thisCopy.path != null){
+            for (int i = 0; i < thisCopy.path.size(); i++) {
+              int nodeID = thisCopy.path.get(i).getKey();
 
-            if (thisCopy.nodes.get(nodeID).getFill().equals(Color.RED)){
-              thisCopy.nodes.get(nodeID).setFill(Color.GREEN);
-              thisCopy.nodes.get(nodeID).setRadius(7);
+              if (thisCopy.nodes.get(nodeID).getFill().equals(Color.RED)){
+                thisCopy.nodes.get(nodeID).setFill(Color.GREEN);
+                thisCopy.nodes.get(nodeID).setRadius(7);
+              }
             }
           }
        }
@@ -153,17 +162,16 @@ public class Cart extends Circle {
       this.lastEpochTime = currentEpochTime;
       this.traveledLen = 0;
       this.newPathRecentlyAdded = false;
-
-      // check if path finder returned path from 0 to 0, if so end it
-      if (this.path.size() == 2 && this.path.get(0).getKey() == 0 && this.path.get(0).getKey() == 0){
-        return "Finished";
-      }
     }
-
 
     //if there is not defined path, stay on the spot and ask for recalcucation
     if (this.path == null)
       return "Stopped";
+
+    // check if path finder returned path from 0 to 0, if so end it
+    if (this.path.size() >= (this.lastVisitedNodeIndex + 2) && this.path.get(lastVisitedNodeIndex).getKey() == 0 && this.path.get(lastVisitedNodeIndex+1).getKey() == 0){
+      return "Finished";
+    }
 
     int nodeID = this.path.get(0).getKey();
 
@@ -172,7 +180,7 @@ public class Cart extends Circle {
 
     //index in path not node ID!
     Pair<Integer, Integer> p = getLastVisitedNodeIndexAndLen(nodes);
-    int lastVisitedNodeIndex = p.getKey();
+    this.lastVisitedNodeIndex = p.getKey();
     int lastVisitedNodeDistance = p.getValue();
     NodeCircle lastNode = nodes.get(this.path.get(lastVisitedNodeIndex).getKey());
     NodeCircle nextNode = nodes.get(this.path.get(lastVisitedNodeIndex+1).getKey());
