@@ -133,10 +133,12 @@ public class PathFinder {
         node = nodeID;
       }
     }*/
+    int nodeID = 0;
     Set<Integer> shelfIDs = requiredNodes.keySet();
     for(int shelfID: shelfIDs){
-      if(this.distance[actualNode][requiredNodes.get(shelfID)] > 0 && this.distance[actualNode][requiredNodes.get(shelfID)] < min){
-        min = this.distance[actualNode][requiredNodes.get(shelfID)];
+      nodeID = requiredNodes.get(shelfID);
+      if(this.distance[actualNode][nodeID] > 0 && this.distance[actualNode][nodeID] < min){
+        min = this.distance[actualNode][nodeID];
         shelf = shelfID;
       }
     }
@@ -294,10 +296,10 @@ public class PathFinder {
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs,
           int goods_in_cart){
-    System.out.println("Start refindPath");
+    /*System.out.println("Start refindPath");
     for(int i = 0; i < order.size(); i++){
       System.out.print("Order ID: " + i + " with good name: " + order.get(i).getKey() + " number: " + order.get(i).getValue() + " \n");
-    }
+    }*/
     int actualNode = path.get(0).getKey();
     if(distance[actualNode][0] == Integer.MAX_VALUE){
       System.out.print("Cannot get to starting node!\n");
@@ -314,7 +316,6 @@ public class PathFinder {
           if(newOrder.get(j).getKey().equals(path.get(i).getValue().getKey())){  //good with same name is yet in newOrder list
             newItem = false;
             int tmpItemsNumber = newOrder.get(j).getValue();
-            newOrder.remove(j);
             newOrder.set(j, new Pair<String, Integer>(path.get(i).getValue().getKey(), path.get(i).getValue().getValue() + tmpItemsNumber));
             break;
           }
