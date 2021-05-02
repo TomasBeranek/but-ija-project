@@ -40,6 +40,7 @@ public class Cart extends Circle {
   private ArrayList<Pair<String, Integer>> pickedUpGoods = new ArrayList<>();
   private int lastVisitedNodeID;
   private boolean newPathRecentlyAdded = true;
+  private int lastVisitedNodeIndexCopy = 0;
 
   /**
    * @param x The cart's x coordinate.
@@ -59,14 +60,15 @@ public class Cart extends Circle {
 
   public List<Pair<Integer, Pair<String, Integer>>> getRemainingPath(){
     if (this.path == null){
-      return this.pathCopy.subList(lastVisitedNodeIndex, this.pathCopy.size());
+      System.out.println(this.pathCopy.subList(this.lastVisitedNodeIndexCopy, this.pathCopy.size()));
+      return this.pathCopy.subList(this.lastVisitedNodeIndexCopy, this.pathCopy.size());
       //Pair<String, Integer> goods = new Pair<>("", 0);
       //ArrayList<Pair<Integer, Pair<String, Integer>>> arr = new ArrayList<Pair<Integer, Pair<String, Integer>>>();
       //arr.add(new Pair<>(this.lastVisitedNodeID, goods));
       //return arr;
     }
     else
-      return this.path.subList(lastVisitedNodeIndex, this.path.size());
+      return this.path.subList(this.lastVisitedNodeIndex, this.path.size());
   }
 
 
@@ -96,6 +98,7 @@ public class Cart extends Circle {
   public void addPath(List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes) {
     if (path == null && this.path != null){
       this.pathCopy = this.path;
+      this.lastVisitedNodeIndexCopy = this.lastVisitedNodeIndex;
       System.out.println(this.pathCopy);
     }
 
@@ -264,7 +267,17 @@ public class Cart extends Circle {
                     //pick the goods form the shelf
                     this.pickedUpGoods.add(new Pair<>(goodsName, quantity));
                     this.currCapacity += quantity;
-                    this.shelves.get(shelfID).decreaseQuantity(quantity);
+
+                    int shelfQuantity = this.shelves.get(shelfID).getQuantity();
+
+                    //check if the there is enough goods in a shelf
+                    if (quantity > shelfQuantity){
+                      this.shelves.get(shelfID).decreaseQuantity(shelfQuantity);
+                      quantity -= shelfQuantity;
+                    } else {
+                      // if not, then search other shelf which are connected to the same node and ahve the same goods
+                      this.shelves.get(shelfID).decreaseQuantity(quantity);
+                    }
 
                     //save previous color
                     this.shelves.get(shelfID).toFront();

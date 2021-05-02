@@ -76,6 +76,12 @@ public class WarehouseSimulation extends Application {
    private Long updateSpeed = 20L; // in ms
    private PathFinder pathFinder;
 
+   private TextField inputGoodsName;
+   private TextField inputGoodsQuantinty;
+   private ListView<String> goodsList;
+   private ObservableList<String> goodsLitems;
+   List<Pair<String, Integer>> inputGoodsList = new ArrayList<>();
+
 
    /** Loads files into JSON objects.
     *
@@ -706,7 +712,7 @@ public class WarehouseSimulation extends Application {
       speedPlusButton.setLayoutX(190 + 15);
       speedPlusButton.setLayoutY(this.warehouseHeight + 15);
       speedPlusButton.setOnAction(actionEvent -> {
-        if (updateSpeed/20 < 64)
+        if (updateSpeed/20 < 32)
           updateSpeed *= 2;
         speed.setText(String.format("%dx", updateSpeed/20));
       });
@@ -807,6 +813,89 @@ public class WarehouseSimulation extends Application {
       orderCaption.setY(545);
       orderCaption.setFont(Font.font ("Sans-serif", 20));
       group.getChildren().add(orderCaption);
+
+      // goods name input
+      this.inputGoodsName = new TextField ();
+      this.inputGoodsName.setLayoutX(this.warehouseWidth + 25);
+      this.inputGoodsName.setLayoutY(565);
+      this.inputGoodsName.setPrefWidth(250);
+      this.inputGoodsName.setPrefHeight(30);
+      this.inputGoodsName.setPromptText("Type of goods");
+      this.inputGoodsName.setFont(Font.font ("Sans-serif", 13));
+      group.getChildren().add(this.inputGoodsName);
+
+      // goods wuantity input
+      this.inputGoodsQuantinty = new TextField ();
+      this.inputGoodsQuantinty.setLayoutX(this.warehouseWidth + 25);
+      this.inputGoodsQuantinty.setLayoutY(605);
+      this.inputGoodsQuantinty.setPrefWidth(100);
+      this.inputGoodsQuantinty.setPrefHeight(30);
+      this.inputGoodsQuantinty.setPromptText("Quantity");
+      this.inputGoodsQuantinty.setFont(Font.font ("Sans-serif", 13));
+      group.getChildren().add(this.inputGoodsQuantinty);
+
+      // add goods to order button
+      Button addGoodsButton = new Button("Add");
+      addGoodsButton.setPrefHeight(30);
+      addGoodsButton.setPrefWidth(70);
+      addGoodsButton.setFont(Font.font ("Sans-serif", 13));
+      addGoodsButton.setLayoutX(this.warehouseWidth + this.sideGUIWidth - 25 - 70);
+      addGoodsButton.setLayoutY(605);
+      addGoodsButton.setOnAction(actionEvent -> {
+        //check for invalid input
+          this.goodsLitems.add(this.inputGoodsQuantinty.getText() + "x\t " + this.inputGoodsName.getText());
+          this.goodsList.setItems(this.goodsLitems);
+          int quantity = Integer.parseInt(this.inputGoodsQuantinty.getText().trim());
+          this.inputGoodsList.add(new Pair<>(this.inputGoodsName.getText(), quantity));
+          this.inputGoodsName.setText("");
+          this.inputGoodsQuantinty.setText("");      });
+      group.getChildren().add(addGoodsButton);
+
+      // a list of ordered goods
+      this.goodsList = new ListView<String>();
+      this.goodsLitems = FXCollections.observableArrayList ();
+      goodsList.setItems(goodsLitems);
+      goodsList.setPrefWidth(250);
+      goodsList.setPrefHeight(105);
+      goodsList.setLayoutX(this.warehouseWidth + 25);
+      goodsList.setLayoutY(645);
+      group.getChildren().add(goodsList);
+
+      // confirm order button
+      Button confirmOrderButton = new Button("Confirm order");
+      confirmOrderButton.setPrefHeight(40);
+      confirmOrderButton.setPrefWidth(115);
+      confirmOrderButton.setFont(Font.font ("Sans-serif", 13));
+      confirmOrderButton.setLayoutX(this.warehouseWidth + 25);
+      confirmOrderButton.setLayoutY(645 + 105 + 15);
+      confirmOrderButton.setOnAction(actionEvent -> {
+        Order newOrder = new Order(this.currentEpochTime, this.inputGoodsList);
+
+        this.inputGoodsList = new ArrayList<>();
+        this.orders.add(newOrder);
+        this.goodsLitems.clear();
+        this.inputGoodsList.clear();
+        this.goodsList.setItems(goodsLitems);
+        this.inputGoodsName.setText("");
+        this.inputGoodsQuantinty.setText("");
+      });
+      group.getChildren().add(confirmOrderButton);
+
+      // delete order button
+      Button clearOrderButton = new Button("Clear order");
+      clearOrderButton.setPrefHeight(40);
+      clearOrderButton.setPrefWidth(125);
+      clearOrderButton.setFont(Font.font ("Sans-serif", 13));
+      clearOrderButton.setLayoutX(this.warehouseWidth + 25 + 115 + 15);
+      clearOrderButton.setLayoutY(645 + 105 + 15);
+      clearOrderButton.setOnAction(actionEvent -> {
+        this.goodsLitems.clear();
+        this.inputGoodsList.clear();
+        this.goodsList.setItems(goodsLitems);
+        this.inputGoodsName.setText("");
+        this.inputGoodsQuantinty.setText("");
+      });
+      group.getChildren().add(clearOrderButton);
 
       // set time button
       Button setTimeButton = new Button("Reset time");
