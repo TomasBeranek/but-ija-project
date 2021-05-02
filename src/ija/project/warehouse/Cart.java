@@ -31,7 +31,7 @@ public class Cart extends Circle {
   private TranslateTransition animation = null;
   private int pickUpTime = 4000; //ms
   private Hashtable<Integer, ShelfRectangle> shelves;
-  private int highlightedShelfID = -1;
+  private ArrayList<Integer> highlightedShelfID = new ArrayList<>();
   private int lastVisitedNodeIndex = 0;
   private Hashtable<Integer, NodeCircle> nodes;
   private boolean cartIsActive = false;
@@ -204,11 +204,11 @@ public class Cart extends Circle {
         return "Stopped";
       }
 
-      if (this.highlightedShelfID != -1){
-        this.shelves.get(highlightedShelfID).setStrokeWidth(4);
-        this.shelves.get(highlightedShelfID).setStroke(Color.BLACK);
-        this.highlightedShelfID = -1;
+      for (int i = 0; i < this.highlightedShelfID.size(); i++) {
+        this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
+        this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
       }
+      this.highlightedShelfID.clear();
 
 
       float percentage = (float)(this.traveledLen + distanceToTravel - lastVisitedNodeDistance) / lastNode.distance(nextNode);
@@ -227,11 +227,11 @@ public class Cart extends Circle {
         if (currentEpochTime < this.waitUntilTime)
           return "Success"; //if we are picking up goods, stay on the spot
 
-        if (this.highlightedShelfID != -1){
-          this.shelves.get(highlightedShelfID).setStrokeWidth(4);
-          this.shelves.get(highlightedShelfID).setStroke(Color.BLACK);
-          this.highlightedShelfID = -1;
-        }
+          for (int i = 0; i < this.highlightedShelfID.size(); i++) {
+            this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
+            this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
+          }
+          this.highlightedShelfID.clear();
 
         //substract remaining distance to the next node
         distanceToTravel -= lastNode.distance(nextNode) - (this.traveledLen - lastVisitedNodeDistance);
@@ -249,7 +249,7 @@ public class Cart extends Circle {
         // check if on the last visisited node is goods that we have to pick up
         if (this.path.get(lastVisitedNodeIndex).getValue().getKey() != ""){
           //wait
-          this.waitUntilTime = currentEpochTime + pickUpTime;
+          this.waitUntilTime = currentEpochTime;
 
           int quantity = this.path.get(lastVisitedNodeIndex).getValue().getValue();
           String goodsName = this.path.get(lastVisitedNodeIndex).getValue().getKey();
@@ -267,6 +267,7 @@ public class Cart extends Circle {
                     //pick the goods form the shelf
                     this.pickedUpGoods.add(new Pair<>(goodsName, quantity));
                     this.currCapacity += quantity;
+                    this.waitUntilTime += pickUpTime;
 
                     int shelfQuantity = this.shelves.get(shelfID).getQuantity();
 
@@ -277,13 +278,18 @@ public class Cart extends Circle {
                     } else {
                       // if not, then search other shelf which are connected to the same node and ahve the same goods
                       this.shelves.get(shelfID).decreaseQuantity(quantity);
+                      quantity = 0;
                     }
 
                     //save previous color
                     this.shelves.get(shelfID).toFront();
                     this.shelves.get(shelfID).setStrokeWidth(6);
                     this.shelves.get(shelfID).setStroke(Color.GREY);
-                    this.highlightedShelfID = shelfID;
+                    this.highlightedShelfID.add(shelfID);
+
+                    // we have taken everything
+                    if (quantity == 0)
+                      break;
                   }
             }
           }

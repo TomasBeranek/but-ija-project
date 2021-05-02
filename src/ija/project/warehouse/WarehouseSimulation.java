@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.text.*;
 import javafx.scene.control.Button;
 import java.util.Map.Entry;
@@ -29,6 +30,7 @@ import javafx.scene.control.TextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.transform.Scale;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
@@ -80,7 +82,10 @@ public class WarehouseSimulation extends Application {
    private TextField inputGoodsQuantinty;
    private ListView<String> goodsList;
    private ObservableList<String> goodsLitems;
-   List<Pair<String, Integer>> inputGoodsList = new ArrayList<>();
+   private List<Pair<String, Integer>> inputGoodsList = new ArrayList<>();
+   private List<Pair<Long, List<Pair<String, Integer>>>> addedOrdersInfo = new ArrayList<>();
+
+   private double currZoom = 1;
 
 
    /** Loads files into JSON objects.
@@ -564,6 +569,7 @@ public class WarehouseSimulation extends Application {
      for (int i = 0; i < orders.size(); i++) {
        if (orders.get(i).isActive(this.currentEpochTime)){
          if (!orders.get(i).hasCart()){
+           System.out.println(orders.get(i).goods);
            orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
          }
 
@@ -674,6 +680,43 @@ public class WarehouseSimulation extends Application {
       for(Integer nodeID : this.nodes.keySet()) {
         nodes.get(nodeID).toFront();
       }
+
+      //display background
+      Rectangle background = new Rectangle(0, 0, this.warehouseWidth, this.warehouseHeight);
+      background.setFill(Color.WHITE);
+      group.getChildren().add(background);
+      background.toBack();
+
+      //Creating the mouse event handler
+      background.setOnScroll((ScrollEvent event) -> {
+        if (event.getDeltaY() > 0){
+          if (currZoom < 8)
+            currZoom *= 2;
+        } else if (event.getDeltaY() < 0) {
+          if (currZoom > 1.0/8)
+            currZoom /= 2;
+        }
+
+        //create scale
+        Scale scale = new Scale();
+        scale.setX(currZoom);
+        scale.setY(currZoom);
+        scale.setPivotX(event.getX());
+        scale.setPivotY(event.getX());
+
+        //warehouse background
+        System.out.println(currZoom);
+
+        //dispensing point
+
+        //shelves
+
+        //routes
+
+        //nodes
+
+        //carts
+      });
 
       //display bottom GUI
       Rectangle bottomGUI = new Rectangle(0, this.warehouseHeight, this.warehouseWidth, bottomGUIHeight);
@@ -869,7 +912,15 @@ public class WarehouseSimulation extends Application {
       confirmOrderButton.setLayoutX(this.warehouseWidth + 25);
       confirmOrderButton.setLayoutY(645 + 105 + 15);
       confirmOrderButton.setOnAction(actionEvent -> {
-        Order newOrder = new Order(this.currentEpochTime, this.inputGoodsList);
+        List<Pair<String, Integer>> goodsTmp  = new ArrayList<>();
+
+        for (int i = 0; i < this.inputGoodsList.size(); i++){
+          Pair<String, Integer> tmp = new Pair<>(this.inputGoodsList.get(i).getKey(), this.inputGoodsList.get(i).getValue());
+          goodsTmp.add(tmp);
+        }
+
+        Order newOrder = new Order(this.currentEpochTime, goodsTmp);
+        this.addedOrdersInfo.add(new Pair<>(this.currentEpochTime, this.inputGoodsList));
 
         this.inputGoodsList = new ArrayList<>();
         this.orders.add(newOrder);
@@ -932,6 +983,11 @@ public class WarehouseSimulation extends Application {
         this.orders = new ArrayList<>();
         this.shelfs = new Hashtable<>();
         this.orders = getAllOrders(data.get(2));
+
+        for (int i = 0; i < this.addedOrdersInfo.size(); i++) {
+          this.orders.add(new Order(this.addedOrdersInfo.get(i).getKey(), this.addedOrdersInfo.get(i).getValue()));
+        }
+
         displayShelfs(group, shelfsCords);
         loadGoodsToShelfs(goods);
 
