@@ -122,17 +122,9 @@ public class PathFinder {
    * @return Number of node with the smallest distance between him and actual node
    */
   private Integer nearestNode(Hashtable<Integer, Integer> requiredNodes, int actualNode){
-    System.out.println("Start of function nearestNode");
     int min = Integer.MAX_VALUE;
     int shelf = -1;
 
-    /*Set<Integer> nodeIDs = requiredNodes.keySet();
-    for(int nodeID: nodeIDs){
-      if(this.distance[actualNode][nodeID] > 0 && this.distance[actualNode][nodeID] < min){
-        min = this.distance[actualNode][nodeID];
-        node = nodeID;
-      }
-    }*/
     int nodeID = 0;
     Set<Integer> shelfIDs = requiredNodes.keySet();
     for(int shelfID: shelfIDs){
@@ -142,12 +134,6 @@ public class PathFinder {
         shelf = shelfID;
       }
     }
-    /*requiredNodes.forEach((k,v) -> {
-      if(this.distance[actualNode][v] > 0 && this.distance[actualNode][v] < min){
-        min = this.distance[actualNode][v];
-        shelf = k;
-      }
-    });*/
 
     return shelf;
   }
@@ -188,10 +174,9 @@ public class PathFinder {
     String goodName = "";
     while(requiredNodes.size() != 0){
       nearest = nearestNode(requiredNodes, actualNode);
-      System.out.println("nearest node is: " + nearest);
       if(nearest == -1)
         break;
-      //actualNode = nearest;
+      actualNode = shelfs.get(nearest).nodeID;
       goodName = shelfs.get(nearest).getGoods();
       for(int j = 0; j < order.size(); j++){  //for each order
         if(order.get(j).getValue() == 0)  //the order has already been processed
@@ -209,7 +194,6 @@ public class PathFinder {
                 path.add(new Pair<Integer, Pair<String, Integer>>(requiredNodes.get(nearest), pickUp));
                 int value = this.localShelfs.get(nearest) + order.get(j).getValue();
                 this.localShelfs.put(nearest, value); //add number of items in order
-                //System.out.print("node: " + nearest + " reserve: " + value + "\n");
                 order.set(j, new Pair<String, Integer>(goodName,0));
               }
               else{ //in cart is not enough space
@@ -305,13 +289,9 @@ public class PathFinder {
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs,
           int goods_in_cart){
-    System.out.println("Start refindPath");
-    /*for(int i = 0; i < order.size(); i++){
-      System.out.print("Order ID: " + i + " with good name: " + order.get(i).getKey() + " number: " + order.get(i).getValue() + " \n");
-    }*/
+
     int actualNode = path.get(0).getKey();
     if(distance[actualNode][0] == Integer.MAX_VALUE){
-      System.out.print("Cannot get to starting node!\n");
       return null;
     }
 
@@ -330,7 +310,6 @@ public class PathFinder {
           }
         }
         if(newItem){  //it is new item
-          System.out.print("refindPath: newOrderList " + path.get(i).getValue().getKey() + "\n");
           newOrder.add(new Pair<String, Integer>(path.get(i).getValue().getKey(), path.get(i).getValue().getValue()));  //add it to newOrder list
         }
 
@@ -340,7 +319,6 @@ public class PathFinder {
         for(Integer key: keys){
           if((shelfs.get(key).nodeID == path.get(i).getKey()) && (shelfs.get(key).getGoods().equals(path.get(i).getValue().getKey()))){  //node of shelf and name of item is same
             value = (this.localShelfs.get(key) - path.get(i).getValue().getValue());
-            System.out.print("Unreservate goods in shelf: " + key + " new reservate goods number: " + value + "\n");
             this.localShelfs.put(key,value);  //reduce number of reservated items in actual shelf
             break;
           }
@@ -348,10 +326,8 @@ public class PathFinder {
       }
     }
     for(int i = 0; i < newOrder.size(); i++){
-      System.out.print("newOrder ID: " + i + " with good name: " + newOrder.get(i).getKey() + " number: " + newOrder.get(i).getValue() + " \n");
     }
 
-    System.out.print("refindPath: find new path; actual node: " + actualNode + " actual goods_in_cart: " + goods_in_cart + "\n");
     return findPath(newOrder, shelfs, actualNode, goods_in_cart);  //return new path
   }
 
@@ -368,13 +344,11 @@ public class PathFinder {
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs,
           int actualNode, int goods_in_cart){
-    System.out.println("start of findPath function");
     Pair<String, Integer> doNotPickUp = new Pair<>("", 0);
     List<Pair<Integer,Pair<String, Integer>>> nodes = orderProcessing(order,shelfs, actualNode, goods_in_cart);  //wanted nodes with goods
     List<Pair<Integer,Pair<String, Integer>>> nodePath = new ArrayList<>(); //path
 
     if(nodes.isEmpty()){
-      System.out.print("Nodes is empty!");
       nodePath.add(new Pair<Integer, Pair<String, Integer>>(actualNode, doNotPickUp));
       nodePath.addAll(constructPath(actualNode,0));
       nodePath.add(new Pair<Integer, Pair<String, Integer>>(0, doNotPickUp)); //add starting node
@@ -383,7 +357,6 @@ public class PathFinder {
       //add path from actual node to first wanted node
       nodePath.add(new Pair<Integer, Pair<String, Integer>>(actualNode, doNotPickUp));
       nodePath.addAll(constructPath(actualNode,nodes.get(0).getKey()));
-      System.out.print("\tFirst node: " + nodes.get(0).getKey() + "\n");
       nodePath.add(nodes.get(0));
 
       for(int i = 0; i < (nodes.size()-1);i++){
@@ -405,8 +378,6 @@ public class PathFinder {
         i++;
       }
     }
-    System.out.println(nodePath);
-    System.out.println("End of findPath function");
     return nodePath;
   }
 }

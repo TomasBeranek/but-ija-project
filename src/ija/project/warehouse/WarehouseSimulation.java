@@ -578,6 +578,10 @@ public class WarehouseSimulation extends Application {
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
+           System.out.println("remaining asdasdas");
+           System.out.println(remainingPath);
+           System.out.println("refind  asdasd");
+           System.out.println(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity));
            orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
@@ -632,6 +636,8 @@ public class WarehouseSimulation extends Application {
      scale.setY(this.currZoom);
      scale.setPivotX(this.zoomX);
      scale.setPivotY(this.zoomY);
+
+
 
      //carts
      for (int i = 0; i < this.orders.size(); i++) {
@@ -1016,6 +1022,7 @@ public class WarehouseSimulation extends Application {
           nodes.get(nodeID).setRadius(5);
         }
 
+        //group.getChildren().remove(highLightedShelfID);
         highLightedShelfID.setText("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
         highLightedNode = null;
 
