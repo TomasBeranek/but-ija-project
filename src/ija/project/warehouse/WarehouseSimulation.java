@@ -925,9 +925,20 @@ public class WarehouseSimulation extends Application {
       addGoodsButton.setLayoutY(605);
       addGoodsButton.setOnAction(actionEvent -> {
         //check for invalid input
+          int quantity;
+
+          try {
+            quantity = Integer.parseInt(this.inputGoodsQuantinty.getText().trim());
+
+          } catch(Exception e) {
+            this.inputGoodsName.setText("");
+            this.inputGoodsQuantinty.setText("");
+            return;
+          }
+
           this.goodsLitems.add(this.inputGoodsQuantinty.getText() + "x\t " + this.inputGoodsName.getText());
           this.goodsList.setItems(this.goodsLitems);
-          int quantity = Integer.parseInt(this.inputGoodsQuantinty.getText().trim());
+
           this.inputGoodsList.add(new Pair<>(this.inputGoodsName.getText(), quantity));
           this.inputGoodsName.setText("");
           this.inputGoodsQuantinty.setText("");
