@@ -1,7 +1,9 @@
 package ija.project.warehouse;
 
-import javafx.scene.shape.Rectangle;
 import java.util.*;
+
+import javafx.scene.shape.Rectangle;
+
 
 /** Represents a shelf in a warehouse. A shelf can contain only a single type
  *  of goods. The class is inherited from the Rectangle class in JavaFX.

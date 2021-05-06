@@ -17,9 +17,12 @@ consists of:
 Limitations
   -- a shelf is accessible only from a single node
   -- on a single shelf can be only one type of goods
-  -- the system does not take into account the weight or volume of the goods
+  -- the system does not take into account the weight or volume of the goods,
   -- a warehouse can only have a single dispensing point
   -- the carts cannot collide with each other
+  -- routes cannot be one-way
+  -- if any goods are unreachable, then the cart will not pick them up
+
 
 
 Input data
