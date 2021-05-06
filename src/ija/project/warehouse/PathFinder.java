@@ -142,6 +142,12 @@ public class PathFinder {
         shelf = shelfID;
       }
     }
+    /*requiredNodes.forEach((k,v) -> {
+      if(this.distance[actualNode][v] > 0 && this.distance[actualNode][v] < min){
+        min = this.distance[actualNode][v];
+        shelf = k;
+      }
+    });*/
 
     return shelf;
   }
@@ -155,18 +161,20 @@ public class PathFinder {
    *  @return Number of nodes with required goods and good name and quantity in sub-optimal order
    */
   private List<Pair<Integer,Pair<String, Integer>>> orderProcessing(List<Pair<String, Integer>> o_order,
-                              Hashtable<Integer, ShelfRectangle> shelfs, int actualNode, int goods_in_cart) {
+                              Hashtable<Integer, ShelfRectangle> shelfs, int actualNode, int cart_num) {
     List<Pair<String, Integer>> order = new ArrayList<Pair<String,Integer>>();
     for(int i = 0; i < o_order.size(); i++){
       order.add(i, new Pair<String, Integer>(o_order.get(i).getKey(),o_order.get(i).getValue()));
     }
-    int cart_num = goods_in_cart;
+
+    int goods_in_cart = cart_num;
     Hashtable<Integer,Integer> requiredNodes = new Hashtable<Integer, Integer>(); //shelfID, nodeID
+
     Set<Integer> Keys = shelfs.keySet();
     for(int i: Keys){
       for(int j = 0; j < order.size(); j++){
         if(shelfs.get(i).getGoods().equals(order.get(j).getKey())){
-          requiredNodes.put(i,shelfs.get(i).nodeID);
+          requiredNodes.put(shelfs.get(i).shelfID,shelfs.get(i).nodeID);
           break;
         }
       }
@@ -180,9 +188,10 @@ public class PathFinder {
     String goodName = "";
     while(requiredNodes.size() != 0){
       nearest = nearestNode(requiredNodes, actualNode);
+      System.out.println("nearest node is: " + nearest);
       if(nearest == -1)
         break;
-      actualNode = nearest;
+      //actualNode = nearest;
       goodName = shelfs.get(nearest).getGoods();
       for(int j = 0; j < order.size(); j++){  //for each order
         if(order.get(j).getValue() == 0)  //the order has already been processed
@@ -296,8 +305,8 @@ public class PathFinder {
           List<Pair<String, Integer>> order,
           Hashtable<Integer, ShelfRectangle> shelfs,
           int goods_in_cart){
-    /*System.out.println("Start refindPath");
-    for(int i = 0; i < order.size(); i++){
+    System.out.println("Start refindPath");
+    /*for(int i = 0; i < order.size(); i++){
       System.out.print("Order ID: " + i + " with good name: " + order.get(i).getKey() + " number: " + order.get(i).getValue() + " \n");
     }*/
     int actualNode = path.get(0).getKey();
