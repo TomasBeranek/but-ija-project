@@ -20,15 +20,7 @@
       <fileset dir="${dest.dir}" includes="${jar.name}"/>
   </path>
 
-  <target name="run" depends="compile">
-    <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
-      <arg value="${warehouse.data}"/>
-      <arg value="${goods.data}"/>
-      <arg value="${orders.data}"/>
-    </java>
-  </target>
-
-  <target name="debug" depends="compile">
+  <target name="run">
     <java classname="ija.project.warehouse.WarehouseSimulation" fork="true" failonerror="yes" classpathref="lib.runtime.path">
       <arg value="${warehouse.data}"/>
       <arg value="${goods.data}"/>
@@ -48,7 +40,7 @@
   </target>
 
   <target name="compile" depends="create-build, create-dest, clean, download-libs">
-    <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" classpathref="lib.compile.path">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" debug="true" debuglevel="lines,vars,source" includeantruntime="false" classpathref="lib.compile.path">
       <compilerarg line="-Xlint:unchecked"/>
     </javac>
 
