@@ -68,6 +68,8 @@ public class WarehouseSimulation extends Application {
    private int cartCapacity = 500;
    private boolean dontPrintSelected = false;
    private ListView<String> cartList;
+   private Rectangle warehouseRect;
+   private Rectangle dispensingPointRec;
 
    private int sideGUIWidth = 300;
    private int sideGUIHeight = 750;
@@ -86,6 +88,8 @@ public class WarehouseSimulation extends Application {
    private List<Pair<Long, List<Pair<String, Integer>>>> addedOrdersInfo = new ArrayList<>();
 
    private double currZoom = 1;
+   private double zoomX;
+   private double zoomY;
 
 
    /** Loads files into JSON objects.
@@ -225,6 +229,7 @@ public class WarehouseSimulation extends Application {
        shelfRec.setFill(Color.BLUE);
        shelfRec.setStrokeWidth(4);
        shelfRec.setStroke(Color.BLACK);
+       shelfRec.setStrokeType(StrokeType.INSIDE);
 
        //Creating the mouse event handler
        EventHandler<MouseEvent> shelfClickHandler = new EventHandler<MouseEvent>() {
@@ -372,7 +377,7 @@ public class WarehouseSimulation extends Application {
     * @param warehouseCords The coordinates of the warehouse background.
     */
    public void displayWarehouse(Group group, Pair<Point2D, Point2D> warehouseCords) {
-     Rectangle warehouseRect = new Rectangle(
+     this.warehouseRect = new Rectangle(
        (int)Math.round(warehouseCords.getKey().getX()),
        (int)Math.round(warehouseCords.getKey().getY()),
        (int)Math.round(warehouseCords.getValue().getX()) - (int)Math.round(warehouseCords.getKey().getX()),
@@ -391,7 +396,7 @@ public class WarehouseSimulation extends Application {
     * @param dispensingPointCords The coordinates of the dispensing point.
     */
    public void displayDispensingPoint(Group group, Pair<Point2D, Point2D> dispensingPointCords) {
-     Rectangle dispensingPointRec = new Rectangle(
+     this.dispensingPointRec = new Rectangle(
        (int)Math.round(dispensingPointCords.getKey().getX()),
        (int)Math.round(dispensingPointCords.getKey().getY()),
        (int)Math.round(dispensingPointCords.getValue().getX()) - (int)Math.round(dispensingPointCords.getKey().getX()),
@@ -514,6 +519,8 @@ public class WarehouseSimulation extends Application {
 
        // add all goods to existing shelfs
        shelf.addGoods(singleGoods.getValue().getKey(), singleGoods.getValue().getValue());
+       //make copy of initial state
+       shelfsInitialQuantity.put(shelf.shelfID, shelf.getQuantity());
      }
    }
 
@@ -557,8 +564,9 @@ public class WarehouseSimulation extends Application {
      // update cart cords
      //cycle through orders
      this.timer.setText(String.format("%02d:%02d:%02d", (this.currentEpochTime/3600000)%24, (this.currentEpochTime/60000)%60, (this.currentEpochTime/1000)%60));
-     if (highLightedNodeID != null && highLightedNode != null && !dontPrintSelected)
+     if (highLightedNodeID != null && highLightedNode != null && !dontPrintSelected){
        this.highLightedNodeID.setText("ID: " + this.highLightedNode.ID + "\nNeighbours: " + this.highLightedNode.getNeighbours());
+     }
      if (highLightedShelfID != null && highLightedShelf != null && !dontPrintSelected) {
        highLightedShelfID.setText("ID: " + highLightedShelf.shelfID +
                                   "\nAssociated node's ID: " + highLightedShelf.nodeID +
@@ -569,7 +577,6 @@ public class WarehouseSimulation extends Application {
      for (int i = 0; i < orders.size(); i++) {
        if (orders.get(i).isActive(this.currentEpochTime)){
          if (!orders.get(i).hasCart()){
-           System.out.println(orders.get(i).goods);
            orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
          }
 
@@ -577,6 +584,10 @@ public class WarehouseSimulation extends Application {
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
+           System.out.println("remaining asdasdas");
+           System.out.println(remainingPath);
+           System.out.println("refind  asdasd");
+           System.out.println(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity));
            orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
@@ -614,6 +625,63 @@ public class WarehouseSimulation extends Application {
        }
      }
    }
+
+
+   private void zoomScene(){
+     //create scale
+     Scale scale = new Scale();
+     scale.setX(this.currZoom);
+     scale.setY(this.currZoom);
+     scale.setPivotX(this.zoomX);
+     scale.setPivotY(this.zoomY);
+
+
+
+     //carts
+     for (int i = 0; i < this.orders.size(); i++) {
+       this.orders.get(i).cart.getTransforms().clear();
+       this.orders.get(i).cart.getTransforms().add(scale);
+       this.orders.get(i).cart.toBack();
+     }
+
+     //nodes
+     Set<Entry<Integer, NodeCircle>> itNode = this.nodes.entrySet();
+
+     for (Entry<Integer, NodeCircle> node : itNode) {
+       node.getValue().getTransforms().clear();
+       node.getValue().getTransforms().add(scale);
+       node.getValue().toBack();
+     }
+
+     //routes
+     Set<Entry<String, Line>> itRoute = this.routes.entrySet();
+
+     for (Entry<String, Line> route : itRoute) {
+       route.getValue().getTransforms().clear();
+       route.getValue().getTransforms().add(scale);
+       route.getValue().toBack();
+     }
+
+     //shelves
+     Set<Entry<Integer, ShelfRectangle>> itShelf = this.shelfs.entrySet();
+
+     for (Entry<Integer, ShelfRectangle> shelf : itShelf) {
+       shelf.getValue().getTransforms().clear();
+       shelf.getValue().getTransforms().add(scale);
+       shelf.getValue().toBack();
+     }
+
+     //dispensing point
+     this.dispensingPointRec.getTransforms().clear();
+     this.dispensingPointRec.getTransforms().add(scale);
+     this.dispensingPointRec.toBack();
+
+     //warehouse background
+     this.warehouseRect.getTransforms().clear();
+     this.warehouseRect.getTransforms().add(scale);
+     this.warehouseRect.toBack();
+   }
+
 
    /** Creates a GUI, loads data and starts the simulation.
     *
@@ -680,43 +748,6 @@ public class WarehouseSimulation extends Application {
       for(Integer nodeID : this.nodes.keySet()) {
         nodes.get(nodeID).toFront();
       }
-
-      //display background
-      Rectangle background = new Rectangle(0, 0, this.warehouseWidth, this.warehouseHeight);
-      background.setFill(Color.WHITE);
-      group.getChildren().add(background);
-      background.toBack();
-
-      //Creating the mouse event handler
-      background.setOnScroll((ScrollEvent event) -> {
-        if (event.getDeltaY() > 0){
-          if (currZoom < 8)
-            currZoom *= 2;
-        } else if (event.getDeltaY() < 0) {
-          if (currZoom > 1.0/8)
-            currZoom /= 2;
-        }
-
-        //create scale
-        Scale scale = new Scale();
-        scale.setX(currZoom);
-        scale.setY(currZoom);
-        scale.setPivotX(event.getX());
-        scale.setPivotY(event.getX());
-
-        //warehouse background
-        System.out.println(currZoom);
-
-        //dispensing point
-
-        //shelves
-
-        //routes
-
-        //nodes
-
-        //carts
-      });
 
       //display bottom GUI
       Rectangle bottomGUI = new Rectangle(0, this.warehouseHeight, this.warehouseWidth, bottomGUIHeight);
@@ -891,8 +922,22 @@ public class WarehouseSimulation extends Application {
           int quantity = Integer.parseInt(this.inputGoodsQuantinty.getText().trim());
           this.inputGoodsList.add(new Pair<>(this.inputGoodsName.getText(), quantity));
           this.inputGoodsName.setText("");
-          this.inputGoodsQuantinty.setText("");      });
+          this.inputGoodsQuantinty.setText("");
+      });
       group.getChildren().add(addGoodsButton);
+
+      // add goods to order button
+      Button addActiveGoodsButton = new Button("Add");
+      addActiveGoodsButton.setPrefHeight(30);
+      addActiveGoodsButton.setPrefWidth(70);
+      addActiveGoodsButton.setFont(Font.font ("Sans-serif", 13));
+      addActiveGoodsButton.setLayoutX(this.warehouseWidth + this.sideGUIWidth - 25 - 70);
+      addActiveGoodsButton.setLayoutY(128);
+      addActiveGoodsButton.setOnAction(actionEvent -> {
+        if (this.highLightedShelf != null)
+          this.inputGoodsName.setText(this.highLightedShelf.getGoods());
+      });
+      group.getChildren().add(addActiveGoodsButton);
 
       // a list of ordered goods
       this.goodsList = new ListView<String>();
@@ -975,21 +1020,26 @@ public class WarehouseSimulation extends Application {
           nodes.get(nodeID).setRadius(5);
         }
 
-        group.getChildren().remove(highLightedShelfID);
-        highLightedShelf = null;
+        //group.getChildren().remove(highLightedShelfID);
+        highLightedShelfID.setText("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
+        highLightedNode = null;
 
         this.cartList.setItems(FXCollections.observableArrayList ("No cart selected"));
 
         this.orders = new ArrayList<>();
-        this.shelfs = new Hashtable<>();
         this.orders = getAllOrders(data.get(2));
 
         for (int i = 0; i < this.addedOrdersInfo.size(); i++) {
           this.orders.add(new Order(this.addedOrdersInfo.get(i).getKey(), this.addedOrdersInfo.get(i).getValue()));
         }
 
-        displayShelfs(group, shelfsCords);
-        loadGoodsToShelfs(goods);
+
+        //set shelves to initial state
+        Set<Entry<Integer, ShelfRectangle>> itShelf = this.shelfs.entrySet();
+
+        for (Entry<Integer, ShelfRectangle> shelf : itShelf) {
+          shelf.getValue().setQuantity(this.shelfsInitialQuantity.get(shelf.getValue().shelfID));
+        }
 
         //reset pathFinder
         this.pathFinder = new PathFinder(this.nodes, this.shelfs, this.cartCapacity);
@@ -999,12 +1049,34 @@ public class WarehouseSimulation extends Application {
           orders.get(i).addCart(this.group, pathFinder.findPath(orders.get(i).goods, shelfs, 0, 0), nodes, shelfs, this.cartList, this.cartCapacity);
         }
 
-        dontPrintSelected = false;
+        //zoom newly created carts
+        this.zoomScene();
       });
       group.getChildren().add(setTimeButton);
 
       //Creating a Scene by passing the group object, height and width
       Scene scene = new Scene(group ,this.warehouseWidth + sideGUIWidth, this.warehouseHeight + bottomGUIHeight);
+
+      WarehouseSimulation thisCopy = this;
+
+      //Creating the mouse event handler
+      scene.addEventFilter(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
+          @Override
+          public void handle(ScrollEvent event) {
+            thisCopy.zoomX = event.getX();
+            thisCopy.zoomY = event.getY();
+
+            if (event.getDeltaY() > 0){
+              if (currZoom < 8)
+                currZoom *= 2;
+            } else if (event.getDeltaY() < 0) {
+              if (currZoom > 1.0/8)
+                currZoom /= 2;
+            }
+
+            thisCopy.zoomScene();
+          }
+      });
 
       //Setting the title to Stage
       primaryStage.setTitle("Warehouse Simulation");
@@ -1031,7 +1103,12 @@ public class WarehouseSimulation extends Application {
           Runnable drawState = new Runnable() {
             @Override
             public void run() {
-                drawCurrentState();
+              try {
+                 drawCurrentState();
+              } catch (Exception e) {
+                 e.printStackTrace();
+                 e.getMessage();
+              }
             }
           };
           Platform.runLater(drawState);

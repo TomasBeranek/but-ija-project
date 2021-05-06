@@ -144,6 +144,48 @@ public class Cart extends Circle {
               }
             }
           }
+
+          for(Integer shelfID : thisCopy.shelves.keySet()) {
+            if (thisCopy.shelves.get(shelfID).getStroke().equals(Color.GREEN)){
+              thisCopy.shelves.get(shelfID).setStrokeWidth(4);
+              thisCopy.shelves.get(shelfID).setStroke(Color.BLACK);
+            }
+          }
+
+          //show shelfs
+          //find shelf by nodeID and goods name and pick up goods
+          for (int i = 0; i < thisCopy.path.size(); i++) {
+            int nodeID = thisCopy.path.get(i).getKey();
+            String goods = thisCopy.path.get(i).getValue().getKey();
+            int quantity = thisCopy.path.get(i).getValue().getValue();
+
+            if (goods.equals(""))
+              continue;
+
+            for(Integer shelfID : thisCopy.shelves.keySet()) {
+              if (thisCopy.shelves.get(shelfID).getGoods().equals(goods)
+                  && thisCopy.shelves.get(shelfID).getNode() == nodeID){
+
+                    int shelfQuantity = thisCopy.shelves.get(shelfID).getQuantity();
+
+                    //check if the there is enough goods in a shelf
+                    if (quantity > shelfQuantity){
+                      quantity -= shelfQuantity;
+                    } else {
+                      // if not, then search other shelf which are connected to the same node and ahve the same goods
+                      quantity = 0;
+                    }
+
+                    //save previous color
+                    thisCopy.shelves.get(shelfID).setStrokeWidth(6);
+                    thisCopy.shelves.get(shelfID).setStroke(Color.GREEN);
+
+                    // we have taken everything
+                    if (quantity == 0)
+                      break;
+                  }
+            }
+          }
        }
     };
     this.addEventFilter(MouseEvent.MOUSE_CLICKED, cartClickHandler);
@@ -205,8 +247,13 @@ public class Cart extends Circle {
       }
 
       for (int i = 0; i < this.highlightedShelfID.size(); i++) {
-        this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
-        this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
+        if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.GREY)){
+          this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
+          this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
+        } else {
+          this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(6);
+          this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.GREEN);
+        }
       }
       this.highlightedShelfID.clear();
 
@@ -228,8 +275,13 @@ public class Cart extends Circle {
           return "Success"; //if we are picking up goods, stay on the spot
 
           for (int i = 0; i < this.highlightedShelfID.size(); i++) {
-            this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
-            this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
+            if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.GREY)){
+              this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
+              this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
+            } else {
+              this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(6);
+              this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.GREEN);
+            }
           }
           this.highlightedShelfID.clear();
 
@@ -282,10 +334,15 @@ public class Cart extends Circle {
                     }
 
                     //save previous color
-                    this.shelves.get(shelfID).toFront();
-                    this.shelves.get(shelfID).setStrokeWidth(6);
-                    this.shelves.get(shelfID).setStroke(Color.GREY);
-                    this.highlightedShelfID.add(shelfID);
+                    if (this.shelves.get(shelfID).getStroke().equals(Color.GREEN)){
+                      this.shelves.get(shelfID).setStrokeWidth(6);
+                      this.shelves.get(shelfID).setStroke(Color.DARKGREY);
+                      this.highlightedShelfID.add(shelfID);
+                    } else {
+                      this.shelves.get(shelfID).setStrokeWidth(6);
+                      this.shelves.get(shelfID).setStroke(Color.GREY);
+                      this.highlightedShelfID.add(shelfID);
+                    }
 
                     // we have taken everything
                     if (quantity == 0)
