@@ -263,7 +263,7 @@ public class Cart extends Circle {
         if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.GREY)){
           this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
           this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
-        } else {
+        } else if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.DARKGREY)){
           this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(6);
           this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.GREEN);
         }
@@ -290,7 +290,7 @@ public class Cart extends Circle {
             if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.GREY)){
               this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(4);
               this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.BLACK);
-            } else {
+            } else if (this.shelves.get(this.highlightedShelfID.get(i)).getStroke().equals(Color.DARKGREY)){
               this.shelves.get(this.highlightedShelfID.get(i)).setStrokeWidth(6);
               this.shelves.get(this.highlightedShelfID.get(i)).setStroke(Color.GREEN);
             }

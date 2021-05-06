@@ -61,7 +61,6 @@ public class WarehouseSimulation extends Application {
    private Text timer;
    private Text speed;
    private int cartCapacity = 500;
-   private boolean dontPrintSelected = false;
    private ListView<String> cartList;
    private Rectangle warehouseRect;
    private Rectangle dispensingPointRec;
@@ -338,6 +337,16 @@ public class WarehouseSimulation extends Application {
                  nodes.get(nodeID).setRadius(5);
                }
 
+               for(Integer shelfID : shelfs.keySet()){
+                 if (shelfs.get(shelfID).getStroke().equals(Color.GREEN)){
+                   shelfs.get(shelfID).setStroke(Color.BLACK);
+                   shelfs.get(shelfID).setStrokeWidth(4);
+                 } else if (shelfs.get(shelfID).getStroke().equals(Color.DARKGREY)){
+                   shelfs.get(shelfID).setStroke(Color.GREY);
+                   shelfs.get(shelfID).setStrokeWidth(6);
+                 }
+               }
+
                nodeCircle.setFill(Color.BLUE);
                nodeCircle.setRadius(7);
                highLightedNode = (NodeCircle)nodeCircle;
@@ -558,10 +567,11 @@ public class WarehouseSimulation extends Application {
      // update cart cords
      //cycle through orders
      this.timer.setText(String.format("%02d:%02d:%02d", (this.currentEpochTime/3600000)%24, (this.currentEpochTime/60000)%60, (this.currentEpochTime/1000)%60));
-     if (highLightedNodeID != null && highLightedNode != null && !dontPrintSelected){
+
+     if (highLightedNodeID != null && highLightedNode != null){
        this.highLightedNodeID.setText("ID: " + this.highLightedNode.ID + "\nNeighbours: " + this.highLightedNode.getNeighbours());
      }
-     if (highLightedShelfID != null && highLightedShelf != null && !dontPrintSelected) {
+     if (highLightedShelfID != null && highLightedShelf != null) {
        highLightedShelfID.setText("ID: " + highLightedShelf.shelfID +
                                   "\nAssociated node's ID: " + highLightedShelf.nodeID +
                                   "\nContent: \n" + highLightedShelf.getGoods() +
@@ -1002,25 +1012,29 @@ public class WarehouseSimulation extends Application {
         currentEpochTime = 0L;
 
         for (int i = 0; i < orders.size(); i++) {
-          orders.get(i).cart.setRadius(0);
-          group.getChildren().remove(orders.get(i).cart);
+          if (orders.get(i).cart != null){
+            orders.get(i).cart.setRadius(0);
+            group.getChildren().remove(orders.get(i).cart);
+          }
         }
 
-        dontPrintSelected = true;
         if (this.highLightedNodeID != null){
           this.highLightedNodeID.setText("ID: -\nNeighbours: -");
         }
-
         highLightedNode = null;
+
 
         for(Integer nodeID : nodes.keySet()){
           nodes.get(nodeID).setFill(Color.RED);
           nodes.get(nodeID).setRadius(5);
         }
 
-        //group.getChildren().remove(highLightedShelfID);
-        highLightedShelfID.setText("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
-        highLightedNode = null;
+        if (this.highLightedShelfID != null)
+          highLightedShelfID.setText("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
+        if (this.highLightedShelf != null)
+          highLightedShelf.setFill(Color.BLUE);
+
+        highLightedShelf = null;
 
         this.cartList.setItems(FXCollections.observableArrayList ("No cart selected"));
 
@@ -1037,6 +1051,9 @@ public class WarehouseSimulation extends Application {
 
         for (Entry<Integer, ShelfRectangle> shelf : itShelf) {
           shelf.getValue().setQuantity(this.shelfsInitialQuantity.get(shelf.getValue().shelfID));
+          shelf.getValue().setFill(Color.BLUE);
+          shelf.getValue().setStrokeWidth(4);
+          shelf.getValue().setStroke(Color.BLACK);
         }
 
         //reset pathFinder
