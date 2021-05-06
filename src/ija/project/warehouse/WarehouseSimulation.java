@@ -578,10 +578,6 @@ public class WarehouseSimulation extends Application {
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
-           System.out.println("remaining asdasdas");
-           System.out.println(remainingPath);
-           System.out.println("refind  asdasd");
-           System.out.println(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity));
            orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
