@@ -101,6 +101,11 @@ public class NodeCircle extends Circle {
   }
 
 
+  /** Calculates the distance between this node and given node.
+   *
+   * @param p A node to which a distance should be calculated.
+   * @return The distance between this node in 'p'.
+   */
   public int distance(NodeCircle p) {
     int x = p.getX();
     int y = p.getY();

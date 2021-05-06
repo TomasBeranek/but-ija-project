@@ -43,10 +43,16 @@ public class Cart extends Circle {
   private boolean newPathRecentlyAdded = true;
   private int lastVisitedNodeIndexCopy = 0;
 
+
   /**
    * @param x The cart's x coordinate.
    * @param y The cart's y coordinate.
-   * @param r The cart's radius for a visualization.
+   * @param r The cart's radius for a visualization
+   * @param shelves All the shelfs in the warehouse.
+   * @param startEpochTime The time at which cart should start..
+   * @param cartList The list into currently loaded goods is loaded upon clicking
+   *                  on the cart.
+   * @param capacity The cart's capacity.
    */
   public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves, Long startEpochTime, ListView<String> cartList, int capacity){
     super(x, y, r);
@@ -57,6 +63,10 @@ public class Cart extends Circle {
   }
 
 
+  /** Calculates the remaing path with the last visited node included.
+   *
+   * @return Remaining path with the last visited node included.
+   */
   public List<Pair<Integer, Pair<String, Integer>>> getRemainingPath(){
     if (this.path == null){
       return this.pathCopy.subList(this.lastVisitedNodeIndexCopy, this.pathCopy.size());
@@ -66,6 +76,11 @@ public class Cart extends Circle {
   }
 
 
+  /** Calculates the lenght of the whole path.
+   *
+   * @param nodes The list of all the nodes.
+   * @return A length of a whole path.
+   */
   public int getPathLen(Hashtable<Integer, NodeCircle> nodes) {
     if (this.path == null)
       return 0;
@@ -83,6 +98,7 @@ public class Cart extends Circle {
 
     return len;
   }
+
 
   /** Stores the given sequence of nodes (path).
    *
@@ -189,6 +205,10 @@ public class Cart extends Circle {
    *
    * @param currentEpochTime The current epoch time.
    * @param nodes The list of all the nodes.
+   * @return An information about updating:
+   *          "Stopped" -- the cart cannot continue in the given path
+   *          "Success" -- the cart successfully updated it's position
+   *          "Finished" -- the cart reached the last node in path
    */
   public String updatePosition(Long currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
     if (this.lastEpochTime == 0){
@@ -360,9 +380,13 @@ public class Cart extends Circle {
   }
 
 
-  // return the last visited node for the traveled len
-  // and its distance from the beginning
   // OPTIMIZE: delete this method? and save last visisted node in class variable instead?
+  /** Calculates the last visited node's index in path and it's distance from the
+   *  start.
+   *
+   * @param nodes The list of all the nodes.
+   * @return A pair of values (index in path, distance from start).
+   */
   private Pair<Integer, Integer> getLastVisitedNodeIndexAndLen(Hashtable<Integer, NodeCircle> nodes){
     int l = 0, startNodeID, nextNodeID, lPrev = 0;
 

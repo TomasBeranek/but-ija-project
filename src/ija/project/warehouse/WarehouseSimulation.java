@@ -587,6 +587,9 @@ public class WarehouseSimulation extends Application {
      this.currentEpochTime += this.updateSpeed;
    }
 
+
+   /** Closes the routes with a black color.
+    */
    public void closeBlackRoutes(){
      for(String routeKey : this.routes.keySet()) {
        if (this.routes.get(routeKey).getStroke().equals(Color.BLACK)){
@@ -602,6 +605,8 @@ public class WarehouseSimulation extends Application {
    }
 
 
+   /** Opens the routes with a dark red color.
+    */
    public void openDarkredRoutes(){
      for(String routeKey : this.routes.keySet()) {
        if (this.routes.get(routeKey).getStroke().equals(Color.DARKRED)){
@@ -617,6 +622,9 @@ public class WarehouseSimulation extends Application {
    }
 
 
+   /** Zooms the scene (shelves, nodes, routes, warehouse and dispensing point)
+    *  according to current zoom factor.
+    */
    private void zoomScene(){
      //create scale
      Scale scale = new Scale();

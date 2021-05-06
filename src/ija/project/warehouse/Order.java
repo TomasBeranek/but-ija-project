@@ -17,7 +17,6 @@ import javafx.scene.control.*;
  * @author Tomas Beranek (xberan46)
  */
 public class Order {
-
   public List<Pair<String, Integer>> goods = new ArrayList<>();
   private Long startEpochTime = 0L;
   private Long endEpochTime = Long.MAX_VALUE;
@@ -66,6 +65,10 @@ public class Order {
    * @param group The group object to which a cart is added to be visible.
    * @param path The sequence of nodes (path).
    * @param nodes The list of all the nodes.
+   * @param shelves All the shelfs in the warehouse.
+   * @param cartList The list into currently loaded goods is loaded upon clicking
+   *                  on the cart.
+   * @param capacity The cart's capacity.
    */
   public void addCart(Group group, List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes, Hashtable<Integer, ShelfRectangle> shelves, ListView<String> cartList, int capacity) {
     int startX = nodes.get(path.get(0).getKey()).getX();
@@ -97,6 +100,8 @@ public class Order {
    *
    * @param currentEpochTime Current simulation time.
    * @param nodes The list of all the nodes.
+   * @return false -- The path needs to be recalculated.
+   *         true -- The cart's position has been updated successfully.
    */
   public boolean drawCart(Long currentEpochTime, Hashtable<Integer, NodeCircle> nodes){
     //if update position returns false, it was the last update, which means
@@ -116,6 +121,12 @@ public class Order {
     return true;
   }
 
+
+  /** Signals to the cart to update it's path.
+   *
+   * @param path The sequence of nodes (path).
+   * @param nodes The list of all the nodes.
+   */
   public void updateCartPath(List<Pair<Integer, Pair<String, Integer>>> path, Hashtable<Integer, NodeCircle> nodes){
     this.cart.addPath(path, nodes);
   }

@@ -72,7 +72,7 @@ public class ShelfRectangle extends Rectangle {
 
   /** Sets the quantity of the goods stored in the shelf.
    *
-   * @return The quantity of the goods.
+   * @param quantity The new quantity of the goods.
    */
   public void setQuantity(Integer quantity) {
     this.goodsQuantity = quantity;
