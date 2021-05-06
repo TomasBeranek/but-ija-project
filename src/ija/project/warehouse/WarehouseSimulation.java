@@ -5,42 +5,37 @@ import ija.project.warehouse.NodeCircle;
 import ija.project.warehouse.Order;
 import ija.project.warehouse.PathFinder;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import java.util.Date;
-import javafx.util.*;
 import java.util.*;
-import javafx.geometry.Point2D;
 import java.lang.Math;
-import javafx.scene.shape.*;
-import javafx.scene.paint.Color;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.text.*;
-import javafx.scene.control.Button;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
-import javafx.scene.control.TextField;
+import java.io.*;
+
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.shape.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.transform.Scale;
+import javafx.scene.paint.Color;
+import javafx.scene.control.*;
+import javafx.scene.text.*;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.geometry.Point2D;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.util.*;
 
 //http://www.java2s.com/Code/JarDownload/json-simple/json-simple-1.1.jar.zip
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
+
 
 /** Controls the warehouse simulation. Sets the simulation time and speed. Loads
  *  a floor plan of a warehouse, goods and orders. Creates a GUI and updates the
@@ -550,7 +545,6 @@ public class WarehouseSimulation extends Application {
          goods.add(new Pair<>(goodsName, goodsQuantity));
        }
 
-
        orders.add(new Order(startEpochTime, goods));
      }
 
@@ -584,10 +578,6 @@ public class WarehouseSimulation extends Application {
          if (!orders.get(i).drawCart(this.currentEpochTime, nodes)){
            //we need to recalculate the path
            List<Pair<Integer, Pair<String, Integer>>> remainingPath = orders.get(i).cart.getRemainingPath();
-           System.out.println("remaining asdasdas");
-           System.out.println(remainingPath);
-           System.out.println("refind  asdasd");
-           System.out.println(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity));
            orders.get(i).updateCartPath(pathFinder.refindPath(remainingPath, orders.get(i).goods, shelfs, orders.get(i).cart.currCapacity), nodes);
          }
        }
@@ -634,8 +624,6 @@ public class WarehouseSimulation extends Application {
      scale.setY(this.currZoom);
      scale.setPivotX(this.zoomX);
      scale.setPivotY(this.zoomY);
-
-
 
      //carts
      for (int i = 0; i < this.orders.size(); i++) {
@@ -1020,7 +1008,6 @@ public class WarehouseSimulation extends Application {
           nodes.get(nodeID).setRadius(5);
         }
 
-        //group.getChildren().remove(highLightedShelfID);
         highLightedShelfID.setText("ID: -\nAssociated node's ID: -\nContent:\n-\nQuantity: -");
         highLightedNode = null;
 

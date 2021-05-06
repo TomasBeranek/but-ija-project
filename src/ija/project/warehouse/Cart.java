@@ -1,16 +1,17 @@
 package ija.project.warehouse;
 
-import javafx.scene.shape.Circle;
 import java.util.*;
-import javafx.scene.paint.Color;
+
 import javafx.util.*;
-import javafx.animation.TranslateTransition;
 import javafx.scene.*;
-import javafx.event.EventHandler;
+import javafx.scene.shape.Circle;
+import javafx.scene.paint.Color;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.event.EventHandler;
+import javafx.animation.TranslateTransition;
 
 
 /** Represents a cart which picks up the goods. The class is inherited from
@@ -49,8 +50,6 @@ public class Cart extends Circle {
    */
   public Cart(float x, float y, float r, Hashtable<Integer, ShelfRectangle> shelves, Long startEpochTime, ListView<String> cartList, int capacity){
     super(x, y, r);
-    //this.setCache(true);
-    //this.setCacheHint(CacheHint.SPEED);
     this.shelves = shelves;
     this.startEpochTime = startEpochTime;
     this.cartList = cartList;
@@ -60,12 +59,7 @@ public class Cart extends Circle {
 
   public List<Pair<Integer, Pair<String, Integer>>> getRemainingPath(){
     if (this.path == null){
-      System.out.println(this.pathCopy.subList(this.lastVisitedNodeIndexCopy, this.pathCopy.size()));
       return this.pathCopy.subList(this.lastVisitedNodeIndexCopy, this.pathCopy.size());
-      //Pair<String, Integer> goods = new Pair<>("", 0);
-      //ArrayList<Pair<Integer, Pair<String, Integer>>> arr = new ArrayList<Pair<Integer, Pair<String, Integer>>>();
-      //arr.add(new Pair<>(this.lastVisitedNodeID, goods));
-      //return arr;
     }
     else
       return this.path.subList(this.lastVisitedNodeIndex, this.path.size());
@@ -99,7 +93,6 @@ public class Cart extends Circle {
     if (path == null && this.path != null){
       this.pathCopy = this.path;
       this.lastVisitedNodeIndexCopy = this.lastVisitedNodeIndex;
-      System.out.println(this.pathCopy);
     }
 
     this.path = path;
@@ -265,7 +258,6 @@ public class Cart extends Circle {
       this.setCenterX(nextPositionX);
       this.setCenterY(nextPositionY);
       this.traveledLen += distanceToTravel;
-      //playAnimation(nextPositionX, nextPositionY, duration);
       return "Success";
     }
     //  2) the next position will be between the next two points (including next point)
@@ -365,19 +357,6 @@ public class Cart extends Circle {
         return "Finished";
       }
     }
-  }
-
-
-  private void playAnimation(int x, int y, int duration) {
-    if (this.animation == null){
-      this.animation = new TranslateTransition();
-      this.animation.setNode(this);
-    }
-    this.animation.setDuration(Duration.millis(duration*100));
-    //make realtive position from aboslute, since animation cant handle absolute...
-    this.animation.setToX(x - this.getCenterX());
-    this.animation.setToY(y - this.getCenterY());
-    this.animation.play();
   }
 
 
